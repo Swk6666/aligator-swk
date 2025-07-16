@@ -8,12 +8,21 @@ import crocoddyl as croc
 import aligator
 
 import numpy as np
+import matplotlib.pyplot as plt
+import time
 
 import pinocchio as pin
 import example_robot_data as erd
 
-
 from pinocchio.visualize import MeshcatVisualizer
+from utils import ArgsBase, get_endpoint_traj
+
+
+class Args(ArgsBase):
+    plot: bool = True
+
+
+args = Args().parse_args()
 
 # --- Robot and viewer
 robot = erd.load("ur5")
@@ -26,9 +35,13 @@ q0 = robot.q0.copy()
 v0 = np.zeros(nv)
 x0 = np.concatenate([q0, v0])
 
-vizer = MeshcatVisualizer(rmodel, robot.collision_model, robot.visual_model)
-vizer.initViewer(loadModel=True)
-vizer.display(q0)
+if args.display:
+    vizer = MeshcatVisualizer(rmodel, robot.collision_model, robot.visual_model)
+    vizer.initViewer(loadModel=True, open=True)
+    vizer.display(q0)
+    vizer.setBackgroundColor()
+else:
+    vizer = None
 
 idTool = rmodel.getFrameId("tool0")
 target_frame: pin.SE3 = pin.SE3.Identity()
@@ -136,3 +149,63 @@ print("ourFDDP:", results)
 print("cost", results.traj_cost)
 
 print("cost_ours - cost_croc:", results.traj_cost - solver.cost)
+
+# Visualization and plotting
+if args.plot:
+    # Plot end-effector trajectory and controls
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    
+    # Plot end-effector trajectory
+    pts_croc = get_endpoint_traj(rmodel, robot.data, xs_opt, idTool)
+    pts_aligator = get_endpoint_traj(rmodel, robot.data, results.xs.tolist(), idTool)
+    
+    ax1.plot(pts_croc[:, 0], pts_croc[:, 1], 'b-', label='Crocoddyl', linewidth=2)
+    ax1.plot(pts_aligator[:, 0], pts_aligator[:, 1], 'r--', label='Aligator', linewidth=2)
+    ax1.scatter(*target_frame.translation[:2], marker='*', s=100, c='g', label='Target', zorder=5)
+    ax1.set_xlabel('X (m)')
+    ax1.set_ylabel('Y (m)')
+    ax1.set_title('End-Effector Trajectory (XY plane)')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+    ax1.axis('equal')
+    
+    # Plot controls
+    times = np.linspace(0.0, Tf, nsteps)
+    us_croc = np.array(us_opt)
+    us_aligator = np.array(results.us.tolist())
+    
+    for i in range(nu):
+        ax2.plot(times, us_croc[:, i], 'b-', alpha=0.7, label=f'Croc Joint {i+1}' if i == 0 else "")
+        ax2.plot(times, us_aligator[:, i], 'r--', alpha=0.7, label=f'Alig Joint {i+1}' if i == 0 else "")
+    
+    ax2.set_xlabel('Time (s)')
+    ax2.set_ylabel('Control Torques (Nm)')
+    ax2.set_title('Control Trajectories')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+    
+    plt.tight_layout()
+    plt.show()
+
+# Animation
+if args.display and vizer is not None:
+    print("\nStarting animation...")
+    print("You can view the 3D visualization at the MeshCat URL shown above.")
+    
+    # Play Crocoddyl solution
+    print("Playing Crocoddyl solution...")
+    qs_croc = [x[:nq] for x in xs_opt]
+    for _ in range(2):
+        vizer.play(qs_croc, dt)
+        time.sleep(0.5)
+    
+    input("Press Enter to play Aligator solution...")
+    
+    # Play Aligator solution  
+    print("Playing Aligator solution...")
+    qs_aligator = [x[:nq] for x in results.xs.tolist()]
+    for _ in range(2):
+        vizer.play(qs_aligator, dt)
+        time.sleep(0.5)
+    
+    print("Animation complete!")

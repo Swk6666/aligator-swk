@@ -131,7 +131,7 @@ def configure_viz(target_pos):
     viz = MeshcatVisualizer(
         model=rmodel, collision_model=cmodel, visual_model=vmodel, data=rdata
     )
-    viz.initViewer(loadModel=True, zmq_url=args.zmq_url)
+    viz.initViewer(loadModel=True, open=True)
     manage_lights(viz)
     viz.addGeometryObject(gobj)
     # viz.setBackgroundColor()
@@ -139,7 +139,7 @@ def configure_viz(target_pos):
     return viz
 
 
-target_pos = np.array([2.4, -0.2, 0.0])
+target_pos = np.array([0, 2.0, 0.0])
 
 dt = 0.01
 tf = 2.0  # seconds
@@ -324,7 +324,7 @@ if args.display:
         viz.drawFrameVelocities(proj_frame_id, v_scale=0.06)
         fid = rmodel.getFrameId("ball/root_joint")
         ctar: pin.SE3 = rdata.oMf[fid]
-        viz.setCameraTarget(ctar.translation)
+        # viz.setCameraTarget(ctar.translation)  # 注释掉以避免API兼容性问题
 
     VID_FPS = 30
     vid_ctx = (
@@ -335,7 +335,8 @@ if args.display:
         else contextlib.nullcontext()
     )
 
-    input("[press enter]")
+    print("Playing optimized trajectory...")
+    # input("[press enter]")  # 注释掉手动等待
 
     with vid_ctx:
         viz.play(qs, dt, callback=viz_callback)

@@ -134,8 +134,8 @@ plt.tight_layout()
 plt.show()
 
 if args.display:
-    vizer.setCameraPosition([1.2, 0.0, 1.2])
-    vizer.setCameraTarget([0.0, 0.0, 1.0])
+    # vizer.setCameraPosition([1.2, 0.0, 1.2])  # 注释掉以避免API兼容性问题
+    # vizer.setCameraTarget([0.0, 0.0, 1.0])
     qs = [x[:nq] for x in results.xs.tolist()]
 
     for _ in range(3):

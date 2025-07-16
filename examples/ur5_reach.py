@@ -262,7 +262,7 @@ if args.display:
 
     with ctx:
         for i in range(num_repeat):
-            vizer.setCameraPosition(cps_[i])
+            # vizer.setCameraPosition(cps_[i])  # 注释掉以避免API兼容性问题
             vizer.play(qs, dt, callback)
 
             time.sleep(0.5)
