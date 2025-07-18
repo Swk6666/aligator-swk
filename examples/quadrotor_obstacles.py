@@ -314,7 +314,7 @@ def main(args: Args):
         vizer = pin.visualize.MeshcatVisualizer(
             rmodel, robot.collision_model, robot.visual_model, data=rdata
         )
-        vizer.initViewer(loadModel=True, zmq_url=args.zmq_url)
+        vizer.initViewer(loadModel=True, open=True)
         manage_lights(vizer)
         vizer.display(x0[:nq])
     else:
@@ -378,6 +378,7 @@ def main(args: Args):
 
         if len(results.lams) > 0:
             plot_costate_value()
+            plt.show(block=False)
 
         nplot = 3
         fig: plt.Figure = plt.figure(figsize=(7.2, 3.2))
@@ -404,7 +405,7 @@ def main(args: Args):
         fig.tight_layout()
         for ext in ["png", "pdf"]:
             fig.savefig(ASSET_DIR / "{}.{}".format(TAG, ext))
-        plt.show()
+        plt.show(block=False)  # 不阻塞程序继续执行
 
     if args.display:
         cam_dist = 2.0
@@ -428,15 +429,18 @@ def main(args: Args):
                 pos_new = rp + directions_[i] * cam_dist
                 nonlocal pos_ema
                 pos_ema = blend * pos_new + (1 - blend) * pos_ema
-                vizer.setCameraPosition(pos_ema)
-                vizer.setCameraTarget(rp)
+                # vizer.setCameraPosition(pos_ema)  # 注释掉以避免API兼容性问题
+                # vizer.setCameraTarget(rp)
                 vel = xs_opt[t][nq:]
                 pin.forwardKinematics(rmodel, vizer.data, qs_opt[t], vel)
                 vizer.drawFrameVelocities(base_link_id)
 
             return _callback
 
-        input("[enter to play]")
+        print("Starting animation playback...")
+        print("You can view the animation in your browser at the MeshCat URL shown above.")
+        input("[press enter to start animation]")
+        
         if args.record:
             ctx = vizer.create_video_ctx(vid_uri, fps=30)
         else:
@@ -444,8 +448,11 @@ def main(args: Args):
 
             ctx = contextlib.nullcontext()
         with ctx:
+            print("Playing animation (4 different camera angles)...")
             for i in range(4):
+                print(f"Camera angle {i+1}/4")
                 vizer.play(qs_opt, dt, get_callback(i))
+                print("Animation completed for this angle.")
 
 
 if __name__ == "__main__":

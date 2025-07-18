@@ -12,12 +12,18 @@ import hppfcl
 
 from utils import ArgsBase, get_endpoint_traj
 
+## 方便的指定一些布尔参数，方便调试
+# # 示例1：启用碰撞检测和控制约束
+#python script.py --collisions --bounds
 
+# 示例2：使用FDDP求解器且禁用绘图
+#python script.py --fddp --no-plot
 class Args(ArgsBase):
     plot: bool = True
     fddp: bool = False
     bounds: bool = False
     collisions: bool = False
+    display: bool = True
 
 
 args = Args().parse_args()
@@ -28,15 +34,21 @@ print(args)
 robot = erd.load("ur5")
 rmodel: pin.Model = robot.model
 rdata: pin.Data = robot.data
+
+## 定义一个多体相空间，用于描述机器人的状态和控制
 space = manifolds.MultibodyPhaseSpace(rmodel)
+
 
 vizer = MeshcatVisualizer(rmodel, robot.collision_model, robot.visual_model, data=rdata)
 vizer.initViewer(open=args.display, loadModel=True)
 vizer.setBackgroundColor()
 
+# universe 代表全局世界坐标系
 fr_name = "universe"
 fr_id = rmodel.getFrameId(fr_name)
 joint_id = rmodel.frames[fr_id].parentJoint
+
+## 先忽略碰撞检测
 if args.collisions:
     obstacle_loc = pin.SE3.Identity()
     obstacle_loc.translation[0] = 0.3
@@ -59,8 +71,11 @@ if args.collisions:
 
     vizer.addGeometryObject(geom_object, [1.0, 1.0, 0.5, 1.0])
 
+## 初始化状态
 x0 = space.neutral()
+print("x0", x0.shape)
 
+## 状态的维度
 ndx = space.ndx
 nq = rmodel.nq
 nv = rmodel.nv
@@ -78,6 +93,7 @@ nsteps = int(Tf / dt)
 ode = dynamics.MultibodyFreeFwdDynamics(space, B_mat)
 discrete_dynamics = dynamics.IntegratorSemiImplEuler(ode, dt)
 
+## 代价函数中的状态代价以及控制代价的一些权重
 wt_x = 1e-4 * np.ones(ndx)
 wt_x[nv:] = 1e-2
 wt_x = np.diag(wt_x)
@@ -95,18 +111,25 @@ target_object = pin.GeometryObject(
 vizer.addGeometryObject(target_object, [0.5, 0.5, 1.0, 1.0])
 print(target_pos)
 
+#定义一个末端位置的残差项
 frame_fn = aligator.FrameTranslationResidual(ndx, nu, rmodel, target_pos, tool_id)
 v_ref = pin.Motion()
 v_ref.np[:] = 0.0
+
+#定义一个末端速度的残差项
 frame_vel_fn = aligator.FrameVelocityResidual(
-    ndx, nu, rmodel, v_ref, tool_id, pin.LOCAL
-)
+    ndx, nu, rmodel, v_ref, tool_id, pin.LOCAL)
+
+##终端状态的权重
 wt_x_term = wt_x.copy()
 wt_x_term[:] = 1e-4
+
+## 特定任务的权重，这里指的是末端执行器到达目标点的任务
 wt_frame_pos = 100.0 * np.eye(frame_fn.nr)
 wt_frame_vel = 100.0 * np.ones(frame_vel_fn.nr)
 wt_frame_vel = np.diag(wt_frame_vel)
 
+## 定义一个代价函数，用于描述机器人的状态和控制
 term_cost = aligator.CostStack(space, nu)
 term_cost.addCost("reg", aligator.QuadraticCost(wt_x_term, wt_u * 0))
 term_cost.addCost(
