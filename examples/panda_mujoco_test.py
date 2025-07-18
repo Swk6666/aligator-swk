@@ -3,7 +3,10 @@ import numpy as np
 
 import pinocchio as pin
 from pinocchio.robot_wrapper import RobotWrapper
+import matplotlib
+matplotlib.use('Agg')  # 使用非交互后端，避免窗口保持打开
 import matplotlib.pyplot as plt
+plt.ioff()  # 关闭交互模式
 import matplotlib.gridspec as gridspec
 
 from aligator import constraints, manifolds, dynamics  # noqa
@@ -11,7 +14,9 @@ from pinocchio.visualize import MeshcatVisualizer
 import hppfcl
 
 from utils import ArgsBase, get_endpoint_traj
-
+import mujoco
+import mujoco.viewer
+import time
 ## 方便的指定一些布尔参数，方便调试
 # # 示例1：启用碰撞检测和控制约束
 #python script.py --collisions --bounds
@@ -19,11 +24,12 @@ from utils import ArgsBase, get_endpoint_traj
 # 示例2：使用FDDP求解器且禁用绘图
 #python script.py --fddp --no-plot
 class Args(ArgsBase):
-    plot: bool = True
+    plot: bool = False
     fddp: bool = False
     bounds: bool = True
     collisions: bool = False
-    display: bool = True
+    display: bool = False
+    record: bool = False
 
 
 args = Args().parse_args()
@@ -103,14 +109,15 @@ vizer.display(q0)
 
 B_mat = np.eye(nu)
 
-dt = 0.01
-Tf = 500 * dt
-nsteps = int(Tf / dt)
+dt = 0.002
+Tf = 1.0  # 保持总时间为1秒
+nsteps = int(Tf / dt)  # 现在是500步
 
 ode = dynamics.MultibodyFreeFwdDynamics(space, B_mat)
 discrete_dynamics = dynamics.IntegratorSemiImplEuler(ode, dt)
 
 ## 代价函数中的状态代价以及控制代价的一些权重
+# 为了适应更小的时间步长，调整权重
 wt_x = 1e-4 * np.ones(ndx)
 wt_x[nv:] = 1e-2
 wt_x = np.diag(wt_x)
@@ -118,18 +125,8 @@ wt_u = 1e-4 * np.eye(nu)
 
 
 # 对于Panda机器人，寻找合适的末端执行器frame
-try:
-    tool_name = "attachment"  # 从frame列表中看到的最后一个frame
-    tool_id = rmodel.getFrameId(tool_name)
-except:
-    try:
-        tool_name = "link7"
-        tool_id = rmodel.getFrameId(tool_name)
-    except:
-        # 使用最后一个frame作为fallback
-        tool_id = len(rmodel.frames) - 1
-        tool_name = rmodel.frames[tool_id].name
-        print(f"Warning: Using fallback tool frame: {tool_name}")
+tool_name = "attachment"  # 从frame列表中看到的最后一个frame
+tool_id = rmodel.getFrameId(tool_name)
 
 print(f"Using tool frame: {tool_name}")
 target_pos = np.array([0.35, 0.65, 0.5])
@@ -170,6 +167,7 @@ term_cost.addCost(
 )
 
 u_max = rmodel.effortLimit
+print("u_max", u_max)
 u_min = -u_max
 
 
@@ -208,14 +206,17 @@ for i in range(nsteps):
 
 
 problem = aligator.TrajOptProblem(x0, stages, term_cost=term_cost)
-tol = 1e-7
+tol = 1e-6  # 放松收敛容忍度
 
-mu_init = 1e-7
+mu_init = 1e-6  # 调整初始正则化参数
+verbose = aligator.VerboseLevel.QUIET  # 静默模式，减少输出
 verbose = aligator.VerboseLevel.VERBOSE
-max_iters = 500
+# print(verbose)  # 注释掉打印
+max_iters = 2000  # 增加最大迭代次数
 solver = aligator.SolverProxDDP(tol, mu_init, max_iters=max_iters, verbose=verbose)
 solver.rollout_type = aligator.ROLLOUT_NONLINEAR
 solver.sa_strategy = aligator.SA_LINESEARCH_NONMONOTONE
+
 if args.fddp:
     solver = aligator.SolverFDDP(tol, verbose, max_iters=max_iters)
 cb = aligator.HistoryCallback(solver)
@@ -228,9 +229,55 @@ results = solver.results
 print(results)
 
 xs_opt = results.xs.tolist()
+print("xs_opt", np.asarray(xs_opt).shape)
+q_array = np.asarray(xs_opt)[:, :nq]
+v_array = np.asarray(xs_opt)[:, nq:]
+
+print("q_array", q_array.shape)
+print("v_array", v_array.shape)
 us_opt = np.asarray(results.us.tolist())
+print("us_opt", us_opt.shape)
 
 
+
+mj_model = mujoco.MjModel.from_xml_path("franka_emika_panda/scene.xml")
+mj_data = mujoco.MjData(mj_model)
+
+# 设置初始状态
+mj_data.qpos[:] = x0[:nq]
+mj_data.qvel[:] = x0[nq:nq+nv]
+
+# 设置控制信号并运行仿真
+viewer = None
+try:
+    with mujoco.viewer.launch_passive(mj_model, mj_data) as viewer:
+        for i in range(q_array.shape[0]):
+            # 设置关节位置而不是控制信号
+            mj_data.ctrl[:] = q_array[i, :]
+            # 前向运动学计算
+            mujoco.mj_step(mj_model, mj_data)
+            viewer.sync()
+            time.sleep(0.01)  # 稍微增加延迟以便观察
+            
+            # 检查viewer是否仍然活跃
+            if not viewer.is_running():
+                print("Viewer closed by user")
+                break
+                
+except KeyboardInterrupt:
+    print("Simulation interrupted by user")
+except Exception as e:
+    print(f"Simulation error: {e}")
+finally:
+    # 确保viewer被正确关闭
+    if viewer is not None:
+        try:
+            viewer.close()
+        except:
+            pass
+    print("Simulation completed")
+
+print(1)
 times = np.linspace(0.0, Tf, nsteps + 1)
 
 fig: plt.Figure = plt.figure(constrained_layout=True)
@@ -288,7 +335,10 @@ ax.set_xlabel("iter")
 ax.set_yscale("log")
 plt.legend()
 plt.tight_layout()
-plt.show()
+# 如果需要显示图形，使用非阻塞方式
+if args.plot:
+    plt.show(block=False)  # 非阻塞显示
+    plt.pause(0.1)  # 短暂暂停以确保图形显示
 
 
 if args.display:
@@ -319,3 +369,30 @@ if args.display:
             vizer.play(qs, dt, callback)
 
             time.sleep(0.5)
+
+# 清理资源，确保程序能正常退出
+try:
+    # 关闭所有matplotlib图形
+    plt.close('all')
+    # 清理matplotlib后端
+    plt.ioff()  # 关闭交互模式
+    
+    # 如果有meshcat可视化器，尝试关闭它
+    if 'vizer' in locals():
+        try:
+            vizer.viewer.close()
+        except:
+            pass
+    
+    # 强制垃圾回收
+    import gc
+    gc.collect()
+    
+except Exception as e:
+    print(f"Cleanup warning: {e}")
+
+print("Program completed successfully. Exiting...")
+
+# 强制退出程序，确保返回到终端
+import sys
+sys.exit(0)

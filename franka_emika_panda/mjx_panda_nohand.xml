@@ -194,6 +194,7 @@
   </worldbody>
 
   <actuator>
+    <!--
     <position class="panda" name="actuator1" joint="joint1" kp="1000" kv="20"
      ctrlrange="-2.8973 2.8973"/>
     <position class="panda" name="actuator2" joint="joint2" kp="1000" kv="20"
@@ -207,5 +208,13 @@
     <position class="panda" name="actuator6" joint="joint6" kp="300" kv="2" forcerange="-12 12"
       ctrlrange="-0.0175 3.7525"/>
     <position class="panda" name="actuator7" joint="joint7" kp="300" kv="2" forcerange="-12 12"/>
+    -->
+    <motor name="motor1" joint="joint1"/>
+    <motor name="motor2" joint="joint2"/>
+    <motor name="motor3" joint="joint3"/>
+    <motor name="motor4" joint="joint4"/>
+    <motor name="motor5" joint="joint5"/>
+    <motor name="motor6" joint="joint6"/>
+    <motor name="motor7" joint="joint7"/>
   </actuator>
 </mujoco>
