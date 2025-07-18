@@ -2,7 +2,7 @@ import aligator
 import numpy as np
 
 import pinocchio as pin
-import example_robot_data as erd
+from pinocchio.robot_wrapper import RobotWrapper
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 
@@ -22,7 +22,7 @@ class Args(ArgsBase):
     plot: bool = True
     fddp: bool = False
     bounds: bool = True
-    collisions: bool = True
+    collisions: bool = False
     display: bool = True
 
 
@@ -31,12 +31,19 @@ args = Args().parse_args()
 print(args)
 
 
-robot = erd.load("ur5")
+# 从MuJoCo XML文件加载Panda机器人
+xml_path = "franka_emika_panda/panda_nohand.xml"
+robot = RobotWrapper.BuildFromMJCF(xml_path)
 rmodel: pin.Model = robot.model
 rdata: pin.Data = robot.data
 
 ## 定义一个多体相空间，用于描述机器人的状态和控制
 space = manifolds.MultibodyPhaseSpace(rmodel)
+
+# 打印所有可用的frame名称以便调试
+print("Available frames:")
+for i, frame in enumerate(rmodel.frames):
+    print(f"  {i}: {frame.name}")
 
 
 vizer = MeshcatVisualizer(rmodel, robot.collision_model, robot.visual_model, data=rdata)
@@ -58,7 +65,17 @@ if args.collisions:
         "capsule", fr_id, joint_id, hppfcl.Capsule(0.05, 0.4), obstacle_loc
     )
 
-    fr_id2 = rmodel.getFrameId("wrist_3_joint")
+    # 对于Panda机器人，尝试找到合适的末端执行器frame
+    try:
+        fr_id2 = rmodel.getFrameId("attachment")
+    except:
+        try:
+            fr_id2 = rmodel.getFrameId("link7")
+        except:
+            # 如果找不到特定frame，使用最后一个非universe frame
+            fr_id2 = len(rmodel.frames) - 1
+            print(f"Warning: Using fallback frame: {rmodel.frames[fr_id2].name}")
+    
     joint_id2 = rmodel.frames[fr_id2].parentJoint
     geom_object2 = pin.GeometryObject(
         "endeffector", fr_id2, joint_id2, hppfcl.Sphere(0.1), pin.SE3.Identity()
@@ -87,7 +104,7 @@ vizer.display(q0)
 B_mat = np.eye(nu)
 
 dt = 0.01
-Tf = 100 * dt
+Tf = 500 * dt
 nsteps = int(Tf / dt)
 
 ode = dynamics.MultibodyFreeFwdDynamics(space, B_mat)
@@ -100,9 +117,22 @@ wt_x = np.diag(wt_x)
 wt_u = 1e-4 * np.eye(nu)
 
 
-tool_name = "tool0"
-tool_id = rmodel.getFrameId(tool_name)
-target_pos = np.array([0.15, 0.65, 0.5])
+# 对于Panda机器人，寻找合适的末端执行器frame
+try:
+    tool_name = "attachment"  # 从frame列表中看到的最后一个frame
+    tool_id = rmodel.getFrameId(tool_name)
+except:
+    try:
+        tool_name = "link7"
+        tool_id = rmodel.getFrameId(tool_name)
+    except:
+        # 使用最后一个frame作为fallback
+        tool_id = len(rmodel.frames) - 1
+        tool_name = rmodel.frames[tool_id].name
+        print(f"Warning: Using fallback tool frame: {tool_name}")
+
+print(f"Using tool frame: {tool_name}")
+target_pos = np.array([0.35, 0.65, 0.5])
 target_place = pin.SE3.Identity()
 target_place.translation = target_pos
 target_object = pin.GeometryObject(
