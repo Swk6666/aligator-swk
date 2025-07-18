@@ -16,6 +16,7 @@ import hppfcl
 from utils import ArgsBase, get_endpoint_traj
 import mujoco
 import mujoco.viewer
+from mujoco_sim_env import mujoco_sim_env
 import time
 ## 方便的指定一些布尔参数，方便调试
 # # 示例1：启用碰撞检测和控制约束
@@ -129,7 +130,7 @@ tool_name = "attachment"  # 从frame列表中看到的最后一个frame
 tool_id = rmodel.getFrameId(tool_name)
 
 print(f"Using tool frame: {tool_name}")
-target_pos = np.array([0.35, 0.65, 0.5])
+target_pos = np.array([0.35, 0.35, 0.5])
 target_place = pin.SE3.Identity()
 target_place.translation = target_pos
 target_object = pin.GeometryObject(
@@ -210,7 +211,7 @@ tol = 1e-6  # 放松收敛容忍度
 
 mu_init = 1e-6  # 调整初始正则化参数
 verbose = aligator.VerboseLevel.QUIET  # 静默模式，减少输出
-verbose = aligator.VerboseLevel.VERBOSE
+#verbose = aligator.VerboseLevel.VERBOSE
 # print(verbose)  # 注释掉打印
 max_iters = 2000  # 增加最大迭代次数
 solver = aligator.SolverProxDDP(tol, mu_init, max_iters=max_iters, verbose=verbose)
@@ -239,45 +240,23 @@ us_opt = np.asarray(results.us.tolist())
 print("us_opt", us_opt.shape)
 
 
+mj_sim_env = mujoco_sim_env("franka_emika_panda/scene.xml")
+mj_sim_env.set_initial_state(x0)
+mj_sim_env.run_simulation(q_array, visualize = False)
 
-mj_model = mujoco.MjModel.from_xml_path("franka_emika_panda/scene.xml")
-mj_data = mujoco.MjData(mj_model)
+print("目标位置：", target_pos)
+print("期望最终关节角度：", q_array[-1])
+print("最终mujoco关节角度：", mj_sim_env.data.qpos[:nq])
+print("最终位置（MuJoCo）：", mj_sim_env.get_body_position("attachment"))
 
-# 设置初始状态
-mj_data.qpos[:] = x0[:nq]
-mj_data.qvel[:] = x0[nq:nq+nv]
+# 通过Pinocchio验证最终位置
+q_final = xs_opt[-1][:nq]
+pin.forwardKinematics(rmodel, rdata, q_final)
+pin.updateFramePlacements(rmodel, rdata)
+final_pos_pin = rdata.oMf[tool_id].translation
+print("最终位置（Pinocchio）：", final_pos_pin)
+print("位置误差：", np.linalg.norm(final_pos_pin - target_pos))
 
-# 设置控制信号并运行仿真
-viewer = None
-try:
-    with mujoco.viewer.launch_passive(mj_model, mj_data) as viewer:
-        for i in range(q_array.shape[0]):
-            # 设置关节位置而不是控制信号
-            mj_data.ctrl[:] = q_array[i, :]
-            # 前向运动学计算
-            mujoco.mj_step(mj_model, mj_data)
-            viewer.sync()
-            time.sleep(0.01)  # 稍微增加延迟以便观察
-            
-            # 检查viewer是否仍然活跃
-            if not viewer.is_running():
-                print("Viewer closed by user")
-                break
-                
-except KeyboardInterrupt:
-    print("Simulation interrupted by user")
-except Exception as e:
-    print(f"Simulation error: {e}")
-finally:
-    # 确保viewer被正确关闭
-    if viewer is not None:
-        try:
-            viewer.close()
-        except:
-            pass
-    print("Simulation completed")
-
-print(1)
 times = np.linspace(0.0, Tf, nsteps + 1)
 
 fig: plt.Figure = plt.figure(constrained_layout=True)
