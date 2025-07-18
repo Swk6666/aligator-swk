@@ -210,6 +210,9 @@
       ctrlrange="-0.0175 3.7525"/>
     <general class="panda" name="actuator7" joint="joint7" gainprm="2000" biasprm="0 -2000 -200" forcerange="-12 12"/>
   </actuator>
+  <sensor>
+    <framepos name="attachment_site" objtype="site" objname="attachment_site"/>
+  </sensor>
 
   <keyframe>
     <key name="home" qpos="0 0 0 -1.57079 0 1.57079 -0.7853" ctrl="0 0 0 -1.57079 0 1.57079 -0.7853"/>

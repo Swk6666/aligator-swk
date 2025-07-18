@@ -29,6 +29,7 @@ class Args(ArgsBase):
     fddp: bool = False
     bounds: bool = True
     collisions: bool = False
+    joint_limits: bool = True
     display: bool = False
     record: bool = False
 
@@ -97,6 +98,9 @@ if args.collisions:
 
 ## 初始化状态
 x0 = space.neutral()
+# Set a valid initial joint configuration
+q_init = np.array([0, 0, 0, -1.57079, 0, 1.57079, -0.7853])
+x0[:rmodel.nq] = q_init
 print("x0", x0.shape)
 
 ## 状态的维度
@@ -111,7 +115,7 @@ vizer.display(q0)
 B_mat = np.eye(nu)
 
 dt = 0.002
-Tf = 1.0  # 保持总时间为1秒
+Tf = 4.0  # 保持总时间为1秒
 nsteps = int(Tf / dt)  # 现在是500步
 
 ode = dynamics.MultibodyFreeFwdDynamics(space, B_mat)
@@ -130,7 +134,7 @@ tool_name = "attachment"  # 从frame列表中看到的最后一个frame
 tool_id = rmodel.getFrameId(tool_name)
 
 print(f"Using tool frame: {tool_name}")
-target_pos = np.array([0.35, 0.35, 0.5])
+target_pos = np.array([0.5, 0.4, 0.6])
 target_place = pin.SE3.Identity()
 target_place.translation = target_pos
 target_object = pin.GeometryObject(
@@ -178,6 +182,14 @@ def make_control_bounds():
     return (fun, cstr_set)
 
 
+def make_joint_limit_cstr():
+    space = manifolds.MultibodyPhaseSpace(rmodel)
+    fn = aligator.StateErrorResidual(space, nu, space.neutral())
+    q_min = rmodel.lowerPositionLimit
+    q_max = rmodel.upperPositionLimit
+    return fn[:nq], constraints.BoxConstraint(q_min, q_max)
+
+
 def computeQuasistatic(model: pin.Model, x0, a):
     data = model.createData()
     q0 = x0[:nq]
@@ -203,17 +215,19 @@ for i in range(nsteps):
         stm.addConstraint(frame_col, cstr_set)
     if args.bounds:
         stm.addConstraint(*make_control_bounds())
+    if args.joint_limits:
+        stm.addConstraint(*make_joint_limit_cstr())
     stages.append(stm)
 
 
 problem = aligator.TrajOptProblem(x0, stages, term_cost=term_cost)
-tol = 1e-6  # 放松收敛容忍度
+tol = 1e-4  # 放松收敛容忍度
 
-mu_init = 1e-6  # 调整初始正则化参数
+mu_init = 1e-2  # 调整初始正则化参数
 verbose = aligator.VerboseLevel.QUIET  # 静默模式，减少输出
-#verbose = aligator.VerboseLevel.VERBOSE
+verbose = aligator.VerboseLevel.VERBOSE
 # print(verbose)  # 注释掉打印
-max_iters = 2000  # 增加最大迭代次数
+max_iters = 1000  # 增加最大迭代次数
 solver = aligator.SolverProxDDP(tol, mu_init, max_iters=max_iters, verbose=verbose)
 solver.rollout_type = aligator.ROLLOUT_NONLINEAR
 solver.sa_strategy = aligator.SA_LINESEARCH_NONMONOTONE
@@ -230,6 +244,33 @@ results = solver.results
 print(results)
 
 xs_opt = results.xs.tolist()
+us_opt = results.us.tolist()
+
+
+# 检查约束违反情况
+def check_violations(xs, us):
+    q_min = rmodel.lowerPositionLimit
+    q_max = rmodel.upperPositionLimit
+    u_min = -rmodel.effortLimit
+    u_max = rmodel.effortLimit
+    for i, x in enumerate(xs):
+        q = x[:nq]
+        for j in range(nq):
+            if not (q_min[j] <= q[j] <= q_max[j]):
+                print(f"时间步 {i}: 关节 {j} 角度超限! q[{j}] = {q[j]:.4f}, 限制范围: [{q_min[j]:.4f}, {q_max[j]:.4f}]")
+                return  # 找到第一个就返回
+    for i, u in enumerate(us):
+        for j in range(nu):
+            if not (u_min[j] <= u[j] <= u_max[j]):
+                print(f"时间步 {i}: 控制 {j} 力矩超限! u[{j}] = {u[j]:.4f}, 限制范围: [{u_min[j]:.4f}, {u_max[j]:.4f}]")
+                return  # 找到第一个就返回
+    print("未发现明显的约束违反。")
+
+if results.num_iters >= max_iters:
+    print("\n[!] 求解器达到最大迭代次数，检查轨迹是否存在约束违反：")
+    check_violations(xs_opt, us_opt)
+
+
 print("xs_opt", np.asarray(xs_opt).shape)
 q_array = np.asarray(xs_opt)[:, :nq]
 v_array = np.asarray(xs_opt)[:, nq:]
@@ -315,6 +356,7 @@ ax.set_xlabel("iter")
 ax.set_yscale("log")
 plt.legend()
 plt.tight_layout()
+plt.savefig("examples/panda_mujoco_test.png")
 # 如果需要显示图形，使用非阻塞方式
 if args.plot:
     plt.show(block=False)  # 非阻塞显示
