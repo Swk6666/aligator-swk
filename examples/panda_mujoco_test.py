@@ -115,7 +115,7 @@ vizer.display(q0)
 B_mat = np.eye(nu)
 
 dt = 0.002
-Tf = 4.0  # 保持总时间为1秒
+Tf = 1.0  # 保持总时间为1秒
 nsteps = int(Tf / dt)  # 现在是500步
 
 ode = dynamics.MultibodyFreeFwdDynamics(space, B_mat)
@@ -134,7 +134,7 @@ tool_name = "attachment"  # 从frame列表中看到的最后一个frame
 tool_id = rmodel.getFrameId(tool_name)
 
 print(f"Using tool frame: {tool_name}")
-target_pos = np.array([0.5, 0.4, 0.6])
+target_pos = np.array([-0.5, 0.4, 0.6])
 target_place = pin.SE3.Identity()
 target_place.translation = target_pos
 target_object = pin.GeometryObject(
@@ -157,8 +157,8 @@ wt_x_term = wt_x.copy()
 wt_x_term[:] = 1e-4
 
 ## 特定任务的权重，这里指的是末端执行器到达目标点的任务
-wt_frame_pos = 100.0 * np.eye(frame_fn.nr)
-wt_frame_vel = 100.0 * np.ones(frame_vel_fn.nr)
+wt_frame_pos = 500.0 * np.eye(frame_fn.nr)
+wt_frame_vel = 500.0 * np.ones(frame_vel_fn.nr)
 wt_frame_vel = np.diag(wt_frame_vel)
 
 ## 定义一个代价函数，用于描述机器人的状态和控制
@@ -283,7 +283,7 @@ print("us_opt", us_opt.shape)
 
 mj_sim_env = mujoco_sim_env("franka_emika_panda/scene.xml")
 mj_sim_env.set_initial_state(x0)
-mj_sim_env.run_simulation(q_array, visualize = False)
+mj_sim_env.run_simulation(q_array, visualize = True)
 
 print("目标位置：", target_pos)
 print("期望最终关节角度：", q_array[-1])
