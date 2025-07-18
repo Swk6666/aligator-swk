@@ -249,6 +249,7 @@ print("期望最终关节角度：", q_array[-1])
 print("最终mujoco关节角度：", mj_sim_env.data.qpos[:nq])
 print("最终位置（MuJoCo）：", mj_sim_env.get_body_position("attachment"))
 
+mj_sim_env.print_joint_limits()
 # 通过Pinocchio验证最终位置
 q_final = xs_opt[-1][:nq]
 pin.forwardKinematics(rmodel, rdata, q_final)

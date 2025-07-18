@@ -33,6 +33,9 @@ class mujoco_sim_env:
     
     def step(self):
         mujoco.mj_step(self.model, self.data)
+
+    def print_joint_limits(self):
+        print(self.model.jnt_range)
     
     def run_simulation(self, q_array, visualize = True):
         # 设置控制信号并运行仿真
