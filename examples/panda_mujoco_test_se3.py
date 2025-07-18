@@ -147,8 +147,15 @@ target_object = pin.GeometryObject(
 vizer.addGeometryObject(target_object, [0.5, 0.5, 1.0, 1.0])
 print(target_pos)
 
-#定义一个末端位置的残差项
-frame_fn = aligator.FrameTranslationResidual(ndx, nu, rmodel, target_pos, tool_id)
+# 定义一个末端姿态的残差项
+# The user's attempt to define pose from a quaternion was incorrect.
+# The correct way is to use pinocchio's Quaternion class.
+# The desired quaternion [0.707, 0.707, 0, 0] corresponds to a 90-degree rotation around the X-axis.
+# pin.Quaternion constructor takes (w, x, y, z).
+w, x, y, z = 0.707, 0.707, 0, 0
+target_quat = pin.Quaternion(w, x, y, z).normalized()
+target_pose = pin.SE3(target_quat.toRotationMatrix(), target_pos)
+frame_fn = aligator.FramePlacementResidual(ndx, nu, rmodel, target_pose, tool_id)
 v_ref = pin.Motion()
 v_ref.np[:] = 0.0
 
@@ -161,7 +168,11 @@ wt_x_term = wt_x.copy()
 wt_x_term[:] = 1e-4
 
 ## 特定任务的权重，这里指的是末端执行器到达目标点的任务
-wt_frame_pos = 500.0 * np.eye(frame_fn.nr)
+# 设置期望四元数为[w,x,y,z]
+
+wt_frame_pose = np.eye(frame_fn.nr)
+wt_frame_pose[:3, :3] = 100.0 * np.eye(3)  # 位置权重
+wt_frame_pose[3:, 3:] = 100.0 * np.eye(3)  # 姿态权重
 wt_frame_vel = 500.0 * np.ones(frame_vel_fn.nr)
 wt_frame_vel = np.diag(wt_frame_vel)
 
@@ -169,7 +180,7 @@ wt_frame_vel = np.diag(wt_frame_vel)
 term_cost = aligator.CostStack(space, nu)
 term_cost.addCost("reg", aligator.QuadraticCost(wt_x_term, wt_u * 0))
 term_cost.addCost(
-    "frame", aligator.QuadraticResidualCost(space, frame_fn, wt_frame_pos)
+    "frame", aligator.QuadraticResidualCost(space, frame_fn, wt_frame_pose)
 )
 term_cost.addCost(
     "vel", aligator.QuadraticResidualCost(space, frame_vel_fn, wt_frame_vel)
@@ -302,7 +313,10 @@ pin.updateFramePlacements(rmodel, rdata)
 final_pos_pin = rdata.oMf[tool_id].translation
 print("最终位置（Pinocchio）：", final_pos_pin)
 print("位置误差：", np.linalg.norm(final_pos_pin - target_pos))
-print("最终姿态（Pinocchio）：", pin.SE3ToXYZQUAT(rdata.oMf[tool_id])[3:])
+# Convert to w,x,y,z quaternion format
+quat_xyzw = pin.SE3ToXYZQUAT(rdata.oMf[tool_id])[3:]  # x,y,z,w format
+quat_wxyz = np.array([quat_xyzw[3], quat_xyzw[0], quat_xyzw[1], quat_xyzw[2]])  # w,x,y,z format
+print("最终姿态（Pinocchio）：", quat_wxyz)
 times = np.linspace(0.0, Tf, nsteps + 1)
 
 fig: plt.Figure = plt.figure(constrained_layout=True)
