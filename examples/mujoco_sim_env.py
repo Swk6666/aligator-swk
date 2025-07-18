@@ -37,18 +37,20 @@ class mujoco_sim_env:
     def print_joint_limits(self):
         print(self.model.jnt_range)
     
-    def run_simulation(self, q_array, visualize = True):
+    def run_simulation(self, xs_array, visualize = True):
         # 设置控制信号并运行仿真
         viewer = None
+        nq = self.model.nq
         
         if visualize:
             try:
                 with mujoco.viewer.launch_passive(self.model, self.data) as viewer:
-                    for i in range(q_array.shape[0]):
-                        # 设置关节位置而不是控制信号
-                        self.set_control(q_array[i, :])
-                        # 前向运动学计算
-                        self.step()
+                    for i in range(xs_array.shape[0]):
+                        # 直接从xs_array中设置关节位置和速度
+                        self.data.qpos[:] = xs_array[i, :nq]
+                        self.data.qvel[:] = xs_array[i, nq:]
+                        
+                        mujoco.mj_forward(self.model, self.data)
                         viewer.sync()
                         time.sleep(0.01)  # 稍微增加延迟以便观察
                         
@@ -71,9 +73,9 @@ class mujoco_sim_env:
                 print("Simulation completed")
         else:
             # 不启用可视化，只运行仿真
-            for i in range(q_array.shape[0]):
-                # 设置关节位置而不是控制信号
-                self.set_control(q_array[i, :])
-                # 前向运动学计算
-                self.step()
+            for i in range(xs_array.shape[0]):
+                # 动力学仿真需要控制输入，这里仅作运动学更新
+                self.data.qpos[:] = xs_array[i, :nq]
+                self.data.qvel[:] = xs_array[i, nq:]
+                mujoco.mj_forward(self.model, self.data)
             print("Simulation completed (no visualization)")

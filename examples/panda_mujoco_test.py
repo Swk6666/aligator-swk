@@ -45,6 +45,10 @@ robot = RobotWrapper.BuildFromMJCF(xml_path)
 rmodel: pin.Model = robot.model
 rdata: pin.Data = robot.data
 
+# 设置无重力
+rmodel.gravity.linear = np.zeros(3)
+
+
 ## 定义一个多体相空间，用于描述机器人的状态和控制
 space = manifolds.MultibodyPhaseSpace(rmodel)
 
@@ -115,7 +119,7 @@ vizer.display(q0)
 B_mat = np.eye(nu)
 
 dt = 0.002
-Tf = 1.0  # 保持总时间为1秒
+Tf = 2.0  # 保持总时间为1秒
 nsteps = int(Tf / dt)  # 现在是500步
 
 ode = dynamics.MultibodyFreeFwdDynamics(space, B_mat)
@@ -157,7 +161,9 @@ wt_x_term = wt_x.copy()
 wt_x_term[:] = 1e-4
 
 ## 特定任务的权重，这里指的是末端执行器到达目标点的任务
-wt_frame_pos = 500.0 * np.eye(frame_fn.nr)
+wt_frame_pose = np.eye(frame_fn.nr)
+wt_frame_pose[:3, :3] = 500.0 * np.eye(3)
+wt_frame_pose[3:, 3:] = 500.0 * np.eye(3)
 wt_frame_vel = 500.0 * np.ones(frame_vel_fn.nr)
 wt_frame_vel = np.diag(wt_frame_vel)
 
@@ -165,7 +171,7 @@ wt_frame_vel = np.diag(wt_frame_vel)
 term_cost = aligator.CostStack(space, nu)
 term_cost.addCost("reg", aligator.QuadraticCost(wt_x_term, wt_u * 0))
 term_cost.addCost(
-    "frame", aligator.QuadraticResidualCost(space, frame_fn, wt_frame_pos)
+    "frame", aligator.QuadraticResidualCost(space, frame_fn, wt_frame_pose)
 )
 term_cost.addCost(
     "vel", aligator.QuadraticResidualCost(space, frame_vel_fn, wt_frame_vel)
@@ -283,7 +289,7 @@ print("us_opt", us_opt.shape)
 
 mj_sim_env = mujoco_sim_env("franka_emika_panda/scene.xml")
 mj_sim_env.set_initial_state(x0)
-mj_sim_env.run_simulation(q_array, visualize = True)
+mj_sim_env.run_simulation(np.asarray(xs_opt), visualize = True)
 
 print("目标位置：", target_pos)
 print("期望最终关节角度：", q_array[-1])
