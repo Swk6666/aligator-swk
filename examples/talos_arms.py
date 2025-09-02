@@ -13,6 +13,7 @@ from utils import load_talos_upper_body
 class Args(ArgsBase):
     tcp: str = None
     bounds: bool = True
+    display: bool = True
 
 
 args = Args().parse_args()

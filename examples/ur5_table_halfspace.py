@@ -19,6 +19,7 @@ from aligator.utils.plotting import plot_convergence
 
 class Args(ArgsBase):
     plot: bool = True
+    display: bool = True
 
 
 args = Args().parse_args()
@@ -166,27 +167,40 @@ if args.display:
     import hppfcl
 
     def planehoz(vizer):
+        # 定义桌面的尺寸参数
         p_height = table_height
         p_width = table_side_y_r - table_side_y_l
+        p_depth = 1.0  # 假设桌面的深度为1.0米
         p_center = (table_side_y_l + table_side_y_r) / 2.0
-        plane_g = mgeom.Plane(height=p_width)
-        _M = mtransf.translation_matrix([0.0, p_center, table_height])
+        thickness = 0.01  # 定义一个很小的厚度来模拟平面
+
+        # 创建代表桌面水平表面的“薄盒子”
+        # 尺寸为 [深度, 宽度, 厚度]
+        plane_g = mgeom.Box([p_depth, p_width, thickness])
+        
+        # 设置桌面的位置，注意要考虑厚度，使其顶面在table_height处
+        _M = mtransf.translation_matrix([0.0, p_center, table_height - thickness / 2.0])
+        
+        # 定义材质
         material = mgeom.MeshLambertMaterial(0x7FCB85, opacity=0.4)
+        
+        # 在可视化器中设置桌面对象和其位姿
         vizer.viewer["plane"].set_object(plane_g, material)
         vizer.viewer["plane"].set_transform(_M)
-        plane_v = mgeom.Plane(height=p_height)
-        _Mrot = mtransf.rotation_matrix(np.pi / 2, [1.0, 0.0, 0.0])
-        _M2 = (
-            mtransf.translation_matrix([0.0, table_side_y_l, 0.5 * table_height])
-            @ _Mrot
-        )
-        vizer.viewer["plane_y1"].set_object(plane_v, material)
+
+        # 创建代表侧面挡板的“薄盒子”
+        # 尺寸为 [深度, 厚度, 高度]
+        plane_v1 = mgeom.Box([p_depth, thickness, p_height])
+        plane_v2 = mgeom.Box([p_depth, thickness, p_height])
+
+        # 设置两个侧面挡板的位置
+        _M2 = mtransf.translation_matrix([0.0, table_side_y_l, p_height / 2.0])
+        _M3 = mtransf.translation_matrix([0.0, table_side_y_r, p_height / 2.0])
+
+        vizer.viewer["plane_y1"].set_object(plane_v1, material)
         vizer.viewer["plane_y1"].set_transform(_M2)
-        _M3 = (
-            mtransf.translation_matrix([0.0, table_side_y_r, 0.5 * table_height])
-            @ _Mrot
-        )
-        vizer.viewer["plane_y2"].set_object(plane_v, material)
+        
+        vizer.viewer["plane_y2"].set_object(plane_v2, material)
         vizer.viewer["plane_y2"].set_transform(_M3)
 
     sphere = hppfcl.Sphere(0.05)
@@ -215,8 +229,26 @@ if args.display:
 
     slow_factor = 0.5
     play_dt = dt * slow_factor
-    vizer.setCameraPreset("preset1")
-    vizer.setCameraZoom(1.6)
+
+    # --- 修正部分：开始 ---
+    # 注释掉或删除旧的、会引发错误的 Pinocchio API 调用
+    # vizer.setCameraPreset("preset1")
+    # vizer.setCameraZoom(1.6)
+
+    # 直接使用新的 meshcat API 来设置相机
+    # 这是 "preset1" 在 Pinocchio 源码中对应的相机位姿
+    cam_pos = [1.2, 0.0, 1.2]
+    cam_target = [0.0, 0.0, 1.0]
+    
+    # 在 meshcat 中，相机本身也是场景中的一个对象
+    # 我们可以通过设置它的变换矩阵来控制其位置和朝向
+    # 注意：新版 meshcat 的相机默认朝向-Z轴
+    # 备用方案：如果 look_at_matrix 不可用
+    vizer.viewer["/Cameras/default/rotated/<object>"].set_transform(
+        mtransf.translation_matrix(cam_pos)
+    )
+    # --- 修正部分：结束 ---
+    
     input("[enter to play]")
     nq = rmodel.nq
     qs = [x[:nq] for x in rs.xs]

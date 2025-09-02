@@ -30,7 +30,7 @@ class Args(ArgsBase):
     bounds: bool = True
     collisions: bool = False
     joint_limits: bool = True
-    display: bool = False
+    display: bool = True
     record: bool = False
 
 
