@@ -1,0 +1,43 @@
+<mujoco model="dual_arm_spacerobot">
+  <compiler angle="radian"/>
+  <option gravity="0 0 0"  timestep="0.001" integrator="implicitfast"/>
+  <asset>
+    <mesh name="base_link" file="base_link.STL"/>
+    <mesh name="link0" file="link0.STL"/>
+    <mesh name="link1" file="link1.STL"/>
+    <mesh name="link2" file="link2.STL"/>
+    <mesh name="link3" file="link3.STL"/>
+    <mesh name="link4" file="link4.STL"/>
+    <mesh name="link5" file="link5.STL"/>
+    <mesh name="link6" file="link6.STL"/>
+    <mesh name="link7" file="link7.STL"/>
+  </asset>
+
+    <include file="visual.xml" />
+    <include file="skybox.xml" />
+    <include file="materials.xml" />
+<default>
+    <geom contype="0" conaffinity="0"/>
+</default>
+  <visual>
+    <map force='200'/>
+    <scale forcewidth='0.1'/>
+  </visual>
+  <worldbody>
+    <camera name="fixed_camera" mode="fixed" pos="6.915 -2.570 2.064" xyaxes="0.511 0.860 -0.000 -0.305 0.181 0.935"/>
+
+    <geom name="floor" pos = "0 0 -8" size="10 10 .2" type="plane" material="grid" />
+            <light dir="0 0 -1" directional="true" name="light1" pos="0 -1 6" />
+          <light dir="0 0 -1" directional="true" name="light2" pos="0 1 6" />
+
+
+  </worldbody>
+
+
+
+
+  
+
+  
+
+</mujoco>

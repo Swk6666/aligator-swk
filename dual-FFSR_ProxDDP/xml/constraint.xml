@@ -1,0 +1,63 @@
+<mujoco model="dual_arm_system">
+    <compiler angle="radian"/>
+
+    <default>
+        <joint armature="0.1" damping="1" limited="true"/>
+        <geom conaffinity="0" contype="0" density="100" rgba="0.8 0.6 0.4 1"/>
+    </default>
+
+    <option gravity="0 0 -9.81" timestep="0.001">
+        <flag energy="enable"/>
+    </option>
+
+    <worldbody>
+        <!-- First robotic arm -->
+<body name="base1" pos="-0.5 0 0">
+    <geom size="0.1 0.1 0.00001" type="box"/>
+    <body name="arm1_link1" pos="0 0 0.05">
+    <inertial pos="0 0 0" mass="0.1" diaginertia="0.01 0.01 0.01"/>
+        <!-- 添加第一个关节处的传感器站点 -->
+        <site name="force_sensor1" pos="0 0 0" size="0.01"/>
+        <joint name="arm1_joint1" axis="0 0 1" range="-3.14 3.14"/>
+        <geom size="0.2 0.05 0.05" pos="0.2 0 0" type="box"/>
+        <body name="arm1_link2" pos="0.4 0 0">
+            <!-- 添加第二个关节处的传感器站点 -->
+            <site name="force_sensor2" pos="0 0 0" size="0.01"/>
+            <inertial pos="0 0 0" mass="0.1" diaginertia="0.01 0.01 0.01"/>
+            <joint name="arm1_joint2" axis="0 0 1" range="-3.14 3.14"/>
+            <geom size="0.2 0.05 0.05" pos="0.2 0 0" type="box"/>
+            <body name="gripper1" pos="0.4 0 0">
+                <geom size="0.05 0.05 0.05" type="box"/>
+            </body>
+        </body>
+    </body>
+</body>
+
+        <!-- Object to be grasped -->
+        <body name="object" pos="0.4 0 0">
+        <inertial pos="0 0 0" mass="1" diaginertia="0.01 0.01 0.01"/>
+            <joint type="free"/>
+            <geom size="0.1 0.1 0.1" type="box" rgba="1 0 0 1"/>
+        </body>
+    </worldbody>
+
+    <!-- Weld constraints for grasping -->
+    <equality>
+        <!-- Initially disabled constraints (active="false") -->
+        <weld name="grasp1" body1="gripper1" body2="object" solref="0.01 1" solimp=".9 .9 0.01" active="true"/>
+
+    </equality>
+<!-- 在model标签内添加传感器配置 -->
+<sensor>
+    <!-- 第一个关节的6维力传感器 -->
+    <force name="force_sensor1" site="force_sensor1"/>
+    <torque name="torque_sensor1" site="force_sensor1"/>
+    
+</sensor>
+    <!-- Actuators for joint control -->
+    <actuator>
+        <position name="pos_servo1" joint="arm1_joint1" kp="100" ctrlrange="-3.14 3.14"/>
+        <position name="pos_servo2" joint="arm1_joint2" kp="100" ctrlrange="-3.14 3.14"/>
+
+    </actuator>
+</mujoco>

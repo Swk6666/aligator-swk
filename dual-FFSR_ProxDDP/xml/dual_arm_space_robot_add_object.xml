@@ -1,0 +1,177 @@
+<mujoco model="dual_arm_spacerobot">
+  <compiler angle="radian"/>
+  <option gravity="0 0 0"  timestep="0.001" integrator="implicitfast"/>
+  <asset>
+    <mesh name="base_link" file="base_link.STL"/>
+    <mesh name="link0" file="link0.STL"/>
+    <mesh name="link1" file="link1.STL"/>
+    <mesh name="link2" file="link2.STL"/>
+    <mesh name="link3" file="link3.STL"/>
+    <mesh name="link4" file="link4.STL"/>
+    <mesh name="link5" file="link5.STL"/>
+    <mesh name="link6" file="link6.STL"/>
+    <mesh name="link7" file="link7.STL"/>
+  </asset>
+
+    <include file="visual.xml" />
+    <include file="skybox.xml" />
+    <include file="materials.xml" />
+    
+<default>
+    <geom contype="0" conaffinity="0"/>
+</default>
+  <visual>
+    <map force='200'/>
+    <scale forcewidth='0.1'/>
+    <global azimuth="-120" elevation="-20" offwidth="3000" offheight="1800"/>
+  </visual>
+  <worldbody>
+    <camera name="fixed_camera" mode="fixed" pos="6.915 -2.570 2.064" xyaxes="0.511 0.860 -0.000 -0.305 0.181 0.935"/>
+<camera name="fixed_camera_print" mode="fixed" pos="7 0 0" xyaxes="0 1 0 0 0 1"/>
+    <geom name="floor" pos = "0 0 -8" size="10 10 .2" type="plane" material="grid" />
+            <light dir="0 0 -1" directional="true" name="light1" pos="0 -1 6" />
+          <light dir="0 0 -1" directional="true" name="light2" pos="0 1 6" />
+
+    <body name="chasersat" pos="0 0 0">
+    <inertial pos="0 0 0" mass="5000" diaginertia="12000 12000 12000" />
+      <geom name="base01" type="mesh" rgba="0.529412 0.54902 0.54902 1" mesh="base_link"/>
+      <geom name="link01" pos="1.2 0.5021 1.002" quat="0.00706421 0.0029261 -0.382673 -0.923852" type="mesh" rgba="0 0.4235 0.3294 1" mesh="link0"/>
+      <geom name="link02" pos="1.18 -0.5024 -1.002" quat="3.68624e-05 -8.89945e-05 -0.923881 0.382681" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="link0"/>
+    <body name="link1_1" pos="1.19799 0.633642 1.13356" quat="0.00706421 0.0029261 -0.382673 -0.923852">
+      <inertial pos="0.0054612 -9.8658e-08 0.17936" quat="0.706887 0.017623 0.017623 0.706887" mass="5.0169" diaginertia="0.059094 0.0581283 0.0120867"/>
+      <joint name="joint1_1" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+      <site name="sensor1_1" pos="0 0 0" size="0.01"/>
+      <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link1"/>
+      <body name="link1_2" pos="0.081309 0 0.26299" quat="0.707105 0 0.707108 0">
+        <inertial pos="-6.17355e-08 -0.014333 0.144445" quat="0.996835 0.0795029 4.68491e-07 -5.8741e-06" mass="4.93042" diaginertia="0.0396095 0.0357762 0.0159882"/>
+        <joint name="joint1_2" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+        <site name="sensor1_2" pos="0 0 0" size="0.01"/>
+        <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link2"/>
+        <body name="link1_3" pos="0 -0.11352 0.18827" quat="0.707105 0.707108 0 0">
+          <inertial pos="-1.31363e-07 1.28351 0.109942" quat="0.705047 0.70916 8.93555e-05 -8.88372e-05" mass="51.2952" diaginertia="37.1233 37.1121 0.167991"/>
+          <joint name="joint1_3" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+          <site name="sensor1_3" pos="0 0 0" size="0.01"/>
+          <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link3"/>
+          <body name="link1_4" pos="0 2.5725 0.21885">
+            <inertial pos="1.3136e-07 -1.289 0.1089" quat="0.70916 0.705047 9.25383e-05 -9.30782e-05" mass="51.295" diaginertia="37.123 37.1123 0.16799"/>
+            <joint name="joint1_4" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+            <site name="sensor1_4" pos="0 0 0" size="0.01"/>
+            <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link4"/>
+            <body name="link1_5" pos="0 -2.5725 0.218846">
+              <inertial pos="6.17355e-08 -0.0438218 0.0991901" quat="0.761086 0.648652 -3.82234e-06 4.48489e-06" mass="4.93042" diaginertia="0.0396095 0.0357762 0.0159882"/>
+              <joint name="joint1_5" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+              <site name="sensor1_5" pos="0 0 0" size="0.01"/>
+              <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link5"/>
+              <body name="link1_6" pos="0 -0.18827 0.11352" quat="0.707105 0.707108 0 0">
+                <inertial pos="0.0836299 9.86581e-08 0.0758482" quat="0.512306 0.487384 0.487384 0.512306" mass="5.01692" diaginertia="0.0590938 0.0581279 0.0120863"/>
+                <joint name="joint1_6" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+                <site name="sensor1_6" pos="0 0 0" size="0.01"/>
+                <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link6"/>
+                <body name="link1_7" pos="0.26299 0 0.081309" quat="0.707105 0 0.707108 0">
+                  <inertial pos="0 -0.0137767 0.105693" quat="0.987892 0.155142 0 0" mass="1.73186" diaginertia="0.00748852 0.00636741 0.00317838"/>
+                   <site name="sensor1_7" pos="0 0 0" size="0.01"/>
+                  <joint name="joint1_7" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+                  <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link7"/>
+                  <site name="grip1" pos="0 0 0.185" size="0.01" rgba="0 1 0 1"/>
+        <body name="object" pos="0 0 4.99855469e-01" quat="-7.07105220e-01 7.07108342e-01 0 0">
+
+            <inertial pos="0 0 0" mass="300" diaginertia="3 3 3"/>
+            <site name="object_site" pos="0 0 0" size="0.01" rgba="1 0 0 1"/>
+            <geom size="0.1 0.32 0.1" type="box" rgba="1 0 0 1"/>
+            <site name="object1" pos="0 0.32 0" quat="0.7071 0.7071 0 0" size="0.01" rgba="1 0 0 1"/>
+            <site name="object2" pos="0 -0.32 0" quat="-0.7071 0.7071 0 0" size="0.01" rgba="1 0 0 1"/>
+            <camera name="track" pos="2 1.6 1.5" xyaxes="-1 1.25 0 0 -1.5 2.2" mode="track"/>
+        </body>
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+    <body name="link2_1" pos="1.17997 -0.633956 -1.13356" quat="3.68624e-05 -8.89945e-05 -0.923881 0.382681">
+      <inertial pos="0.0054612 -9.8658e-08 0.17936" quat="0.706887 0.017623 0.017623 0.706887" mass="5.0169" diaginertia="0.059094 0.0581283 0.0120867"/>
+      <joint name="joint2_1" pos="0 0 0" axis="0 0 1" range="-6.28 6.28" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+      <site name="sensor2_1" pos="0 0 0" size="0.01"/>
+      <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link1"/>
+      <body name="link2_2" pos="0.081309 0 0.26299" quat="0.707105 0 0.707108 0">
+      
+        <inertial pos="-6.17355e-08 -0.014333 0.144445" quat="0.996835 0.0795029 4.68491e-07 -5.8741e-06" mass="4.93042" diaginertia="0.0396095 0.0357762 0.0159882"/>
+        <joint name="joint2_2" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+        <site name="sensor2_2" pos="0 0 0" size="0.01"/>
+        <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link2"/>
+        <body name="link2_3" pos="0 -0.11352 0.18827" quat="0.707105 0.707108 0 0">
+          <inertial pos="-1.31363e-07 1.28351 0.109942" quat="0.705047 0.70916 8.93555e-05 -8.88372e-05" mass="51.2952" diaginertia="37.1233 37.1121 0.167991"/>
+          <joint name="joint2_3" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+          <site name="sensor2_3" pos="0 0 0" size="0.01"/>
+          <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link3"/>
+          <body name="link2_4" pos="0 2.5725 0.21885">
+            <inertial pos="1.3136e-07 -1.289 0.1089" quat="0.70916 0.705047 9.25383e-05 -9.30782e-05" mass="51.295" diaginertia="37.123 37.1123 0.16799"/>
+            <joint name="joint2_4" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+            <site name="sensor2_4" pos="0 0 0" size="0.01"/>
+            <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link4"/>
+            <body name="link2_5" pos="0 -2.5725 0.218846">
+              <inertial pos="6.17355e-08 -0.0438218 0.0991901" quat="0.761086 0.648652 -3.82234e-06 4.48489e-06" mass="4.93042" diaginertia="0.0396095 0.0357762 0.0159882"/>
+              <joint name="joint2_5" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+              <site name="sensor2_5" pos="0 0 0" size="0.01"/>
+              <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link5"/>
+              <body name="link2_6" pos="0 -0.18827 0.11352" quat="0.707105 0.707108 0 0">
+                <inertial pos="0.0836299 9.86581e-08 0.0758482" quat="0.512306 0.487384 0.487384 0.512306" mass="5.01692" diaginertia="0.0590938 0.0581279 0.0120863"/>
+                <joint name="joint2_6" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+                <site name="sensor2_6" pos="0 0 0" size="0.01"/>
+                <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link6"/>
+                <body name="link2_7" pos="0.26299 0 0.081309" quat="0.707105 0 0.707108 0">
+                  <inertial pos="0 -0.0137767 0.105693" quat="0.987892 0.155142 0 0" mass="1.73186" diaginertia="0.00748852 0.00636741 0.00317838"/>
+                 <site name="sensor2_7" pos="0 0 0" size="0.01"/>
+                  <joint name="joint2_7" pos="0 0 0" axis="0 0 1" range="-3.14 3.14" actuatorfrcrange="-500 500" armature="10" damping="10"/>
+                  <geom type="mesh" rgba="0.3961    0.7608    0.5804 1" mesh="link7"/>
+                  <site name="grip2" pos="0 0 0.185" size="0.01" rgba="0 1 0 1"/>
+
+                </body>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+</body>
+
+
+
+
+
+  </worldbody>
+
+<equality>
+    <weld name="grasp1" body1="link1_7" body2="object" relpose="0 0 4.99855469e-01 -7.07105220e-01 7.07108342e-01 0 0" solref="0.05 0.3" solimp=".9 .9 0.0005" active="false" torquescale="2"/>
+    <weld name="grasp2" body1="link2_7" body2="object" relpose="0 0 4.99855469e-01 7.07105220e-01 7.07108342e-01 0 0" solref="0.05 0.3" solimp=".9 .9 0.0005" active="false" torquescale="2"/>
+</equality>
+
+
+  <actuator>
+    <motor name="actuator1" joint="joint1_1"/>
+    <motor name="actuator2" joint="joint1_2"/>
+    <motor name="actuator3" joint="joint1_3"/>
+    <motor name="actuator4" joint="joint1_4"/>
+    <motor name="actuator5" joint="joint1_5"/>
+    <motor name="actuator6" joint="joint1_6"/>
+    <motor name="actuator7" joint="joint1_7"/>
+    <motor name="actuator8" joint="joint2_1"/>
+    <motor name="actuator9" joint="joint2_2"/>
+    <motor name="actuator10" joint="joint2_3"/>
+    <motor name="actuator11" joint="joint2_4"/>
+    <motor name="actuator12" joint="joint2_5"/>
+    <motor name="actuator13" joint="joint2_6"/>
+    <motor name="actuator14" joint="joint2_7"/>
+  </actuator> 
+  
+
+  
+<sensor>
+    <force name="joint1_7_sensor_force" site="sensor1_7"/>
+    <torque name="joint1_7_sensor_torque" site="sensor1_7"/> 
+    <force name="joint2_7_sensor_force" site="sensor2_7"/>
+    <torque name="joint2_7_sensor_torque" site="sensor2_7"/> 
+</sensor>
+
+</mujoco>
