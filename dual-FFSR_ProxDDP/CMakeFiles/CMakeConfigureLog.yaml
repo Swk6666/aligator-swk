@@ -1,0 +1,708 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineSystem.cmake:205 (message)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:7 (project)"
+    message: |
+      The system is: Darwin - 24.3.0 - arm64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:7 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" failed.
+      Compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ 
+      Build flags: 
+      Id flags:  
+      
+      The output was:
+      1
+      ld: library 'c++' not found
+      c++: error: linker command failed with exit code 1 (use -v to see invocation)
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:7 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ 
+      Build flags: 
+      Id flags: -c 
+      
+      The output was:
+      0
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "CMakeCXXCompilerId.o"
+      
+      The CXX compiler identification is AppleClang, found in:
+        /Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/3.31.6/CompilerIdCXX/CMakeCXXCompilerId.o
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:74 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:7 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-iXxWfI"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-iXxWfI"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_CXX_SCAN_FOR_MODULES: "OFF"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-iXxWfI'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_6ae28
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -v -Wl,-v -MD -MT CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -c /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+        Apple clang version 16.0.0 (clang-1600.0.26.6)
+        Target: arm64-apple-darwin24.3.0
+        Thread model: posix
+        InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+        c++: warning: -Wl,-v: 'linker' input unused [-Wunused-command-line-argument]
+        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"
+         "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple arm64-apple-macosx15.0.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -target-sdk-version=15.2 -fvisibility-inlines-hidden-static-local-var -fno-modulemap-allow-subdirectory-search -target-cpu apple-m1 -target-feature +v8.5a -target-feature +aes -target-feature +crc -target-feature +dotprod -target-feature +fp-armv8 -target-feature +fp16fml -target-feature +lse -target-feature +ras -target-feature +rcpc -target-feature +rdm -target-feature +sha2 -target-feature +sha3 -target-feature +neon -target-feature +zcm -target-feature +zcz -target-feature +fullfp16 -target-abi darwinpcs -debugger-tuning=lldb -target-linker-version 1115.7.3 -v "-fcoverage-compilation-dir=/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-iXxWfI" -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16 -dependency-file CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1 -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -Wno-reserved-identifier -Wno-gnu-folding-constant -std=c++17 -fdeprecated-macro "-fdebug-compilation-dir=/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-iXxWfI" -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fno-cxx-modules -fcxx-exceptions -fexceptions -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -clang-vendor-feature=+disableAtImportPrivateFrameworkInImplementationError -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp
+        clang -cc1 version 16.0.0 (clang-1600.0.26.6) default target arm64-apple-darwin24.3.0
+        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/local/include"
+        ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/Library/Frameworks"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1
+         /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include
+         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include
+         /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include
+         /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/System/Library/Frameworks (framework directory)
+        End of search list.
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -v -Wl,-v CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_6ae28   && :
+        Apple clang version 16.0.0 (clang-1600.0.26.6)
+        Target: arm64-apple-darwin24.3.0
+        Thread model: posix
+        InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+         "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 15.0.0 15.2 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -mllvm -enable-linkonceodr-outlining -o cmTC_6ae28 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/lib/darwin/libclang_rt.osx.a
+        @(#)PROGRAM:ld PROJECT:ld-1115.7.3
+        BUILD 23:52:02 Dec  5 2024
+        configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
+        will use ld-classic for: armv6 armv7 armv7s i386 armv6m armv7k armv7m armv7em
+        LTO support using: LLVM version 16.0.0 (static support for 29, runtime is 29)
+        TAPI support using: Apple TAPI version 16.0.0 (tapi-1600.0.11.9)
+        Library search paths:
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/lib
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/lib/swift
+        Framework search paths:
+        	/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/System/Library/Frameworks
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:113 (message)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:7 (project)"
+    message: |
+      Effective list of requested architectures (possibly empty)  : ""
+      Effective list of architectures found in the ABI info binary: "arm64"
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:182 (message)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:7 (project)"
+    message: |
+      Parsed CXX implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1]
+          add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include]
+          add: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include]
+          add: [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        end of search list found
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1]
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include]
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include]
+        collapse include dir [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include] ==> [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        implicit include dirs: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include;/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:218 (message)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:7 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(ld[0-9]*(\\.[a-z]+)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(\\.[a-z]+)?))("|,| |$)]
+        ignore line: [Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-iXxWfI']
+        ignore line: []
+        ignore line: [Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_6ae28]
+        ignore line: [[1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -v -Wl -v -MD -MT CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -c /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Apple clang version 16.0.0 (clang-1600.0.26.6)]
+        ignore line: [Target: arm64-apple-darwin24.3.0]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
+        ignore line: [c++: warning: -Wl -v: 'linker' input unused [-Wunused-command-line-argument]]
+        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1"]
+        ignore line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" -cc1 -triple arm64-apple-macosx15.0.0 -Wundef-prefix=TARGET_OS_ -Wdeprecated-objc-isa-usage -Werror=deprecated-objc-isa-usage -Werror=implicit-function-declaration -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -mframe-pointer=non-leaf -fno-strict-return -ffp-contract=on -fno-rounding-math -funwind-tables=1 -fobjc-msgsend-selector-stubs -target-sdk-version=15.2 -fvisibility-inlines-hidden-static-local-var -fno-modulemap-allow-subdirectory-search -target-cpu apple-m1 -target-feature +v8.5a -target-feature +aes -target-feature +crc -target-feature +dotprod -target-feature +fp-armv8 -target-feature +fp16fml -target-feature +lse -target-feature +ras -target-feature +rcpc -target-feature +rdm -target-feature +sha2 -target-feature +sha3 -target-feature +neon -target-feature +zcm -target-feature +zcz -target-feature +fullfp16 -target-abi darwinpcs -debugger-tuning=lldb -target-linker-version 1115.7.3 -v "-fcoverage-compilation-dir=/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-iXxWfI" -resource-dir /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16 -dependency-file CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o.d -skip-unused-modulemap-deps -MT CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1 -internal-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/local/include -internal-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include -internal-externc-isystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include -Wno-reorder-init-list -Wno-implicit-int-float-conversion -Wno-c99-designator -Wno-final-dtor-non-final-class -Wno-extra-semi-stmt -Wno-misleading-indentation -Wno-quoted-include-in-framework-header -Wno-implicit-fallthrough -Wno-enum-enum-conversion -Wno-enum-float-conversion -Wno-elaborated-enum-base -Wno-reserved-identifier -Wno-gnu-folding-constant -std=c++17 -fdeprecated-macro "-fdebug-compilation-dir=/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-iXxWfI" -ferror-limit 19 -stack-protector 1 -fstack-check -mdarwin-stkchk-strong-link -fblocks -fencode-extended-block-signature -fregister-global-dtors-with-atexit -fgnuc-version=4.2.1 -fno-cxx-modules -fcxx-exceptions -fexceptions -fmax-type-align=16 -fcommon -clang-vendor-feature=+disableNonDependentMemberExprInCurrentInstantiation -fno-odr-hash-protocols -clang-vendor-feature=+enableAggressiveVLAFolding -clang-vendor-feature=+revert09abecef7bbf -clang-vendor-feature=+thisNoAlignAttr -clang-vendor-feature=+thisNoNullAttr -clang-vendor-feature=+disableAtImportPrivateFrameworkInImplementationError -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -x c++ /opt/homebrew/share/cmake/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [clang -cc1 version 16.0.0 (clang-1600.0.26.6) default target arm64-apple-darwin24.3.0]
+        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/local/include"]
+        ignore line: [ignoring nonexistent directory "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/Library/Frameworks"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include/c++/v1]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include]
+        ignore line: [ /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/System/Library/Frameworks (framework directory)]
+        ignore line: [End of search list.]
+        ignore line: [[2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl -search_paths_first -Wl -headerpad_max_install_names -v -Wl -v CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_6ae28   && :]
+        ignore line: [Apple clang version 16.0.0 (clang-1600.0.26.6)]
+        ignore line: [Target: arm64-apple-darwin24.3.0]
+        ignore line: [Thread model: posix]
+        ignore line: [InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin]
+        link line: [ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" -demangle -lto_library /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib -dynamic -arch arm64 -platform_version macos 15.0.0 15.2 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -mllvm -enable-linkonceodr-outlining -o cmTC_6ae28 -search_paths_first -headerpad_max_install_names -v CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o -lc++ -lSystem /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/lib/darwin/libclang_rt.osx.a]
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld] ==> ignore
+          arg [-demangle] ==> ignore
+          arg [-lto_library] ==> ignore, skip following value
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib] ==> skip value of -lto_library
+          arg [-dynamic] ==> ignore
+          arg [-arch] ==> ignore
+          arg [arm64] ==> ignore
+          arg [-platform_version] ==> ignore
+          arg [macos] ==> ignore
+          arg [15.0.0] ==> ignore
+          arg [15.2] ==> ignore
+          arg [-syslibroot] ==> ignore
+          arg [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk] ==> ignore
+          arg [-mllvm] ==> ignore
+          arg [-enable-linkonceodr-outlining] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_6ae28] ==> ignore
+          arg [-search_paths_first] ==> ignore
+          arg [-headerpad_max_install_names] ==> ignore
+          arg [-v] ==> ignore
+          arg [CMakeFiles/cmTC_6ae28.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [-lc++] ==> lib [c++]
+          arg [-lSystem] ==> lib [System]
+          arg [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/lib/darwin/libclang_rt.osx.a] ==> lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/lib/darwin/libclang_rt.osx.a]
+        linker tool for 'CXX': /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld
+        Library search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/lib/swift]
+        Framework search paths: [;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/System/Library/Frameworks]
+        remove lib [System]
+        remove lib [/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/lib/darwin/libclang_rt.osx.a]
+        collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/lib] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/lib]
+        collapse library dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/lib/swift] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/lib/swift]
+        collapse framework dir [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/System/Library/Frameworks] ==> [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/System/Library/Frameworks]
+        implicit libs: [c++]
+        implicit objs: []
+        implicit dirs: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/lib;/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/usr/lib/swift]
+        implicit fwks: [/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk/System/Library/Frameworks]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/Internal/CMakeDetermineLinkerId.cmake:40 (message)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeDetermineCompilerABI.cmake:255 (cmake_determine_linker_id)"
+      - "/opt/homebrew/share/cmake/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:7 (project)"
+    message: |
+      Running the CXX compiler's linker: "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" "-v"
+      @(#)PROGRAM:ld PROJECT:ld-1115.7.3
+      BUILD 23:52:02 Dec  5 2024
+      configured to support archs: armv6 armv7 armv7s arm64 arm64e arm64_32 i386 x86_64 x86_64h armv6m armv7k armv7m armv7em
+      will use ld-classic for: armv6 armv7 armv7s i386 armv6m armv7k armv7m armv7em
+      LTO support using: LLVM version 16.0.0 (static support for 29, runtime is 29)
+      TAPI support using: Apple TAPI version 16.0.0 (tapi-1600.0.11.9)
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:108 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/share/cmake/Modules/CheckCXXCompilerFlag.cmake:55 (cmake_check_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:159 (check_cxx_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:62 (CXX_FLAGS_BY_COMPILER_FRONTEND)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/post-project.cmake:90 (_SETUP_PROJECT_WARNINGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:13 (project)"
+    checks:
+      - "Performing Test res_-pedantic"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-XihZrs"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-XihZrs"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "res_-pedantic"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-XihZrs'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_801ad
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Dres_-pedantic -pedantic -MD -MT CMakeFiles/cmTC_801ad.dir/src.cxx.o -MF CMakeFiles/cmTC_801ad.dir/src.cxx.o.d -o CMakeFiles/cmTC_801ad.dir/src.cxx.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-XihZrs/src.cxx'
+        In file included from <built-in>:485:
+        <command line>:1:13: warning: ISO C99 requires whitespace after the macro name [-Wc99-extensions]
+            1 | #define res_-pedantic 1
+              |             ^
+        1 warning generated.
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTC_801ad.dir/src.cxx.o -o cmTC_801ad   && :
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:108 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/share/cmake/Modules/CheckCXXCompilerFlag.cmake:55 (cmake_check_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:159 (check_cxx_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:62 (CXX_FLAGS_BY_COMPILER_FRONTEND)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/post-project.cmake:90 (_SETUP_PROJECT_WARNINGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:13 (project)"
+    checks:
+      - "Performing Test res_-Wno-long-long"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-yIy4Mm"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-yIy4Mm"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "res_-Wno-long-long"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-yIy4Mm'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_7d500
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Dres_-Wno-long-long -Wno-long-long -MD -MT CMakeFiles/cmTC_7d500.dir/src.cxx.o -MF CMakeFiles/cmTC_7d500.dir/src.cxx.o.d -o CMakeFiles/cmTC_7d500.dir/src.cxx.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-yIy4Mm/src.cxx'
+        In file included from <built-in>:485:
+        <command line>:1:13: warning: ISO C99 requires whitespace after the macro name [-Wc99-extensions]
+            1 | #define res_-Wno-long-long 1
+              |             ^
+        1 warning generated.
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTC_7d500.dir/src.cxx.o -o cmTC_7d500   && :
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:108 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/share/cmake/Modules/CheckCXXCompilerFlag.cmake:55 (cmake_check_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:159 (check_cxx_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:62 (CXX_FLAGS_BY_COMPILER_FRONTEND)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/post-project.cmake:90 (_SETUP_PROJECT_WARNINGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:13 (project)"
+    checks:
+      - "Performing Test res_-Wall"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-8MriWq"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-8MriWq"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "res_-Wall"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-8MriWq'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_fd7d3
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Dres_-Wall -Wall -MD -MT CMakeFiles/cmTC_fd7d3.dir/src.cxx.o -MF CMakeFiles/cmTC_fd7d3.dir/src.cxx.o.d -o CMakeFiles/cmTC_fd7d3.dir/src.cxx.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-8MriWq/src.cxx'
+        In file included from <built-in>:485:
+        <command line>:1:13: warning: ISO C99 requires whitespace after the macro name [-Wc99-extensions]
+            1 | #define res_-Wall 1
+              |             ^
+        1 warning generated.
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTC_fd7d3.dir/src.cxx.o -o cmTC_fd7d3   && :
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:108 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/share/cmake/Modules/CheckCXXCompilerFlag.cmake:55 (cmake_check_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:159 (check_cxx_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:62 (CXX_FLAGS_BY_COMPILER_FRONTEND)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/post-project.cmake:90 (_SETUP_PROJECT_WARNINGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:13 (project)"
+    checks:
+      - "Performing Test res_-Wextra"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-Va5orT"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-Va5orT"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "res_-Wextra"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-Va5orT'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_aa87b
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Dres_-Wextra -Wextra -MD -MT CMakeFiles/cmTC_aa87b.dir/src.cxx.o -MF CMakeFiles/cmTC_aa87b.dir/src.cxx.o.d -o CMakeFiles/cmTC_aa87b.dir/src.cxx.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-Va5orT/src.cxx'
+        In file included from <built-in>:485:
+        <command line>:1:13: warning: ISO C99 requires whitespace after the macro name [-Wc99-extensions]
+            1 | #define res_-Wextra 1
+              |             ^
+        1 warning generated.
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTC_aa87b.dir/src.cxx.o -o cmTC_aa87b   && :
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:108 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/share/cmake/Modules/CheckCXXCompilerFlag.cmake:55 (cmake_check_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:159 (check_cxx_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:62 (CXX_FLAGS_BY_COMPILER_FRONTEND)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/post-project.cmake:90 (_SETUP_PROJECT_WARNINGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:13 (project)"
+    checks:
+      - "Performing Test res_-Wcast-align"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-i3mHA7"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-i3mHA7"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "res_-Wcast-align"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-i3mHA7'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_5c5d0
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Dres_-Wcast-align -Wcast-align -MD -MT CMakeFiles/cmTC_5c5d0.dir/src.cxx.o -MF CMakeFiles/cmTC_5c5d0.dir/src.cxx.o.d -o CMakeFiles/cmTC_5c5d0.dir/src.cxx.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-i3mHA7/src.cxx'
+        In file included from <built-in>:485:
+        <command line>:1:13: warning: ISO C99 requires whitespace after the macro name [-Wc99-extensions]
+            1 | #define res_-Wcast-align 1
+              |             ^
+        1 warning generated.
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTC_5c5d0.dir/src.cxx.o -o cmTC_5c5d0   && :
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:108 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/share/cmake/Modules/CheckCXXCompilerFlag.cmake:55 (cmake_check_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:159 (check_cxx_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:62 (CXX_FLAGS_BY_COMPILER_FRONTEND)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/post-project.cmake:90 (_SETUP_PROJECT_WARNINGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:13 (project)"
+    checks:
+      - "Performing Test res_-Wcast-qual"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-TnmOZP"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-TnmOZP"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "res_-Wcast-qual"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-TnmOZP'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_c6839
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Dres_-Wcast-qual -Wcast-qual -MD -MT CMakeFiles/cmTC_c6839.dir/src.cxx.o -MF CMakeFiles/cmTC_c6839.dir/src.cxx.o.d -o CMakeFiles/cmTC_c6839.dir/src.cxx.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-TnmOZP/src.cxx'
+        In file included from <built-in>:485:
+        <command line>:1:13: warning: ISO C99 requires whitespace after the macro name [-Wc99-extensions]
+            1 | #define res_-Wcast-qual 1
+              |             ^
+        1 warning generated.
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTC_c6839.dir/src.cxx.o -o cmTC_c6839   && :
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:108 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/share/cmake/Modules/CheckCXXCompilerFlag.cmake:55 (cmake_check_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:159 (check_cxx_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:62 (CXX_FLAGS_BY_COMPILER_FRONTEND)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/post-project.cmake:90 (_SETUP_PROJECT_WARNINGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:13 (project)"
+    checks:
+      - "Performing Test res_-Wformat"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-hgpdzD"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-hgpdzD"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "res_-Wformat"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-hgpdzD'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_850d0
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Dres_-Wformat -Wformat -MD -MT CMakeFiles/cmTC_850d0.dir/src.cxx.o -MF CMakeFiles/cmTC_850d0.dir/src.cxx.o.d -o CMakeFiles/cmTC_850d0.dir/src.cxx.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-hgpdzD/src.cxx'
+        In file included from <built-in>:485:
+        <command line>:1:13: warning: ISO C99 requires whitespace after the macro name [-Wc99-extensions]
+            1 | #define res_-Wformat 1
+              |             ^
+        1 warning generated.
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTC_850d0.dir/src.cxx.o -o cmTC_850d0   && :
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:108 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/share/cmake/Modules/CheckCXXCompilerFlag.cmake:55 (cmake_check_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:159 (check_cxx_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:62 (CXX_FLAGS_BY_COMPILER_FRONTEND)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/post-project.cmake:90 (_SETUP_PROJECT_WARNINGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:13 (project)"
+    checks:
+      - "Performing Test res_-Wwrite-strings"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-o5Xs5w"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-o5Xs5w"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "res_-Wwrite-strings"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-o5Xs5w'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_447fe
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Dres_-Wwrite-strings -Wwrite-strings -MD -MT CMakeFiles/cmTC_447fe.dir/src.cxx.o -MF CMakeFiles/cmTC_447fe.dir/src.cxx.o.d -o CMakeFiles/cmTC_447fe.dir/src.cxx.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-o5Xs5w/src.cxx'
+        In file included from <built-in>:485:
+        <command line>:1:13: warning: ISO C99 requires whitespace after the macro name [-Wc99-extensions]
+            1 | #define res_-Wwrite-strings 1
+              |             ^
+        1 warning generated.
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTC_447fe.dir/src.cxx.o -o cmTC_447fe   && :
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckSourceCompiles.cmake:108 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/Internal/CheckCompilerFlag.cmake:18 (cmake_check_source_compiles)"
+      - "/opt/homebrew/share/cmake/Modules/CheckCXXCompilerFlag.cmake:55 (cmake_check_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:159 (check_cxx_compiler_flag)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/compiler.cmake:62 (CXX_FLAGS_BY_COMPILER_FRONTEND)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/post-project.cmake:90 (_SETUP_PROJECT_WARNINGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/CMakeLists.txt:13 (project)"
+    checks:
+      - "Performing Test res_-Wconversion"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-URcB8K"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-URcB8K"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "res_-Wconversion"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-URcB8K'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_5c2bb
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Dres_-Wconversion -Wconversion -MD -MT CMakeFiles/cmTC_5c2bb.dir/src.cxx.o -MF CMakeFiles/cmTC_5c2bb.dir/src.cxx.o.d -o CMakeFiles/cmTC_5c2bb.dir/src.cxx.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-URcB8K/src.cxx'
+        In file included from <built-in>:485:
+        <command line>:1:13: warning: ISO C99 requires whitespace after the macro name [-Wc99-extensions]
+            1 | #define res_-Wconversion 1
+              |             ^
+        1 warning generated.
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTC_5c2bb.dir/src.cxx.o -o cmTC_5c2bb   && :
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:252 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:522 (_OPENMP_GET_FLAGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/package-config.cmake:114 (find_package)"
+      - "CMakeLists.txt:219 (ADD_PROJECT_DEPENDENCY)"
+    description: "Detecting CXX OpenMP compiler info"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-b8HVDp"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-b8HVDp"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "-pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion "
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "OpenMP_COMPILE_RESULT_CXX_Xclang fopenmp"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-b8HVDp'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_1220a
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion  -Xclang -fopenmp -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -MD -MT CMakeFiles/cmTC_1220a.dir/OpenMPTryFlag.cpp.o -MF CMakeFiles/cmTC_1220a.dir/OpenMPTryFlag.cpp.o.d -o CMakeFiles/cmTC_1220a.dir/OpenMPTryFlag.cpp.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-b8HVDp/OpenMPTryFlag.cpp'
+        FAILED: CMakeFiles/cmTC_1220a.dir/OpenMPTryFlag.cpp.o 
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion  -Xclang -fopenmp -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -MD -MT CMakeFiles/cmTC_1220a.dir/OpenMPTryFlag.cpp.o -MF CMakeFiles/cmTC_1220a.dir/OpenMPTryFlag.cpp.o.d -o CMakeFiles/cmTC_1220a.dir/OpenMPTryFlag.cpp.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-b8HVDp/OpenMPTryFlag.cpp'
+        /Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-b8HVDp/OpenMPTryFlag.cpp:2:10: fatal error: 'omp.h' file not found
+            2 | #include <omp.h>
+              |          ^~~~~~~
+        1 error generated.
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:354 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:522 (_OPENMP_GET_FLAGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/package-config.cmake:114 (find_package)"
+      - "CMakeLists.txt:219 (ADD_PROJECT_DEPENDENCY)"
+    description: "Trying CXX OpenMP compiler with '/opt/anaconda3/lib/libomp.dylib'"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-ErrBr1"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-ErrBr1"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "-pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion "
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "OpenMP_COMPILE_RESULT_CXX_Xclang fopenmp"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-ErrBr1'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_dd19b
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Xclang -fopenmp -MD -MT CMakeFiles/cmTC_dd19b.dir/OpenMPTryFlag.cpp.o -MF CMakeFiles/cmTC_dd19b.dir/OpenMPTryFlag.cpp.o.d -o CMakeFiles/cmTC_dd19b.dir/OpenMPTryFlag.cpp.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-ErrBr1/OpenMPTryFlag.cpp'
+        FAILED: CMakeFiles/cmTC_dd19b.dir/OpenMPTryFlag.cpp.o 
+        /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++   -pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Xclang -fopenmp -MD -MT CMakeFiles/cmTC_dd19b.dir/OpenMPTryFlag.cpp.o -MF CMakeFiles/cmTC_dd19b.dir/OpenMPTryFlag.cpp.o.d -o CMakeFiles/cmTC_dd19b.dir/OpenMPTryFlag.cpp.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-ErrBr1/OpenMPTryFlag.cpp'
+        /Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-ErrBr1/OpenMPTryFlag.cpp:2:10: fatal error: 'omp.h' file not found
+            2 | #include <omp.h>
+              |          ^~~~~~~
+        1 error generated.
+        ninja: build stopped: subcommand failed.
+        
+      exitCode: 1
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:365 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:522 (_OPENMP_GET_FLAGS)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/package-config.cmake:114 (find_package)"
+      - "CMakeLists.txt:219 (ADD_PROJECT_DEPENDENCY)"
+    description: "Trying CXX OpenMP compiler with '/opt/anaconda3/lib/libomp.dylib' and '/opt/anaconda3/include'"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-4KxqOj"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-4KxqOj"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "-pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion "
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "OpenMP_COMPILE_RESULT_CXX_Xclang fopenmp"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-4KxqOj'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_b1d02
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/opt/anaconda3/include -pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion   -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk   -Xclang -fopenmp -MD -MT CMakeFiles/cmTC_b1d02.dir/OpenMPTryFlag.cpp.o -MF CMakeFiles/cmTC_b1d02.dir/OpenMPTryFlag.cpp.o.d -o CMakeFiles/cmTC_b1d02.dir/OpenMPTryFlag.cpp.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-4KxqOj/OpenMPTryFlag.cpp'
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion   -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTC_b1d02.dir/OpenMPTryFlag.cpp.o -o cmTC_b1d02  -Wl,-rpath,/opt/anaconda3/lib  /opt/anaconda3/lib/libomp.dylib && :
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:456 (try_compile)"
+      - "/opt/homebrew/share/cmake/Modules/FindOpenMP.cmake:596 (_OPENMP_GET_SPEC_DATE)"
+      - "dual-FFSR_ProxDDP/_deps/jrl-cmakemodules-src/package-config.cmake:114 (find_package)"
+      - "CMakeLists.txt:219 (ADD_PROJECT_DEPENDENCY)"
+    description: "Detecting CXX OpenMP version"
+    directories:
+      source: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-xilyEL"
+      binary: "/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-xilyEL"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: "-pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion "
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+      CMAKE_OSX_ARCHITECTURES: ""
+      CMAKE_OSX_DEPLOYMENT_TARGET: ""
+      CMAKE_OSX_SYSROOT: "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk"
+    buildResult:
+      variable: "OpenMP_SPECTEST_CXX_"
+      cached: true
+      stdout: |
+        Change Dir: '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-xilyEL'
+        
+        Run Build Command(s): /opt/homebrew/bin/ninja -v cmTC_eb5ad
+        [1/2] /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++  -I/opt/anaconda3/include -pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion  -Xclang -fopenmp -std=c++17 -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -MD -MT CMakeFiles/cmTC_eb5ad.dir/OpenMPCheckVersion.cpp.o -MF CMakeFiles/cmTC_eb5ad.dir/OpenMPCheckVersion.cpp.o.d -o CMakeFiles/cmTC_eb5ad.dir/OpenMPCheckVersion.cpp.o -c '/Users/swk/Documents/swk/could delete/aligator/dual-FFSR_ProxDDP/CMakeFiles/CMakeScratch/TryCompile-xilyEL/OpenMPCheckVersion.cpp'
+        [2/2] : && /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++ -pedantic -Wno-long-long -Wall -Wextra -Wcast-align -Wcast-qual -Wformat -Wwrite-strings -Wconversion  -Xclang -fopenmp -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/cmTC_eb5ad.dir/OpenMPCheckVersion.cpp.o -o cmTC_eb5ad   && :
+        
+      exitCode: 0
+...

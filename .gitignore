@@ -12,3 +12,4 @@ build*/
 # pixi environments
 .pixi
 *.egg-info
+dual-FFSR_ProxDDP/_deps/

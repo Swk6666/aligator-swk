@@ -313,7 +313,7 @@ stages = []
 
 # Set up self-collision avoidance using FCL + Pinocchio BVH+GJK on mesh geometry
 collision_pair_indices = []
-min_self_distance = 0.05  # meters
+min_self_distance = 0.5  # meters
 if args.collisions:
     # Define which frames to keep apart: base vs specified arm links
     base_frames = ["chasersat", "base", "link0", "base_link"]  # try multiple identifiers
