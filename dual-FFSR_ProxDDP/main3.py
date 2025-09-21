@@ -312,12 +312,15 @@ init_xs = aligator.rollout(discrete_dynamics, x0, init_us)
 stages = []
 
 # Set up self-collision avoidance using FCL + Pinocchio BVH+GJK on mesh geometry
-collision_pair_indices = []
 min_self_distance = 0.5  # meters
+# Exactly two collision groups: (chasersat, link1_3) and (chasersat, link1_4)
+pairs_chasers_link13 = []
+pairs_chasers_link14 = []
 if args.collisions:
-    # Define which frames to keep apart: base vs specified arm links
-    base_frames = ["chasersat", "base", "link0", "base_link"]  # try multiple identifiers
-    arm_frames = ["link1_3", "link1_4", "link3", "link4"]
+    # Robust frame name sets, consistent with test_convex_hull_FCL.py
+    chasers_frames = ["chasersat", "chasers", "base"]
+    link13_frames = ["link1_3"]
+    link14_frames = ["link1_4"]
     # Debug: list a few geometry objects and their parent frames
     try:
         print("[collision] Listing some geometry objects (idx, name, parentFrameName):")
@@ -327,40 +330,22 @@ if args.collisions:
             print(f"  {i}: {nm} <- {pf}")
     except Exception as e:
         print("[collision] Could not list geoms:", e)
-    collision_pair_indices = add_self_collision_pairs(
-        pin_model, pin_collision_model, base_frames, arm_frames
+    # Build pair groups
+    pairs_chasers_link13 = add_self_collision_pairs(
+        pin_model, pin_collision_model, chasers_frames, link13_frames
     )
-    # Quick sanity check distances at initial configuration
-    init_dists = []
-    try:
-        gdata = pin.GeometryData(pin_collision_model)
-        pin.forwardKinematics(pin_model, pin_data, q0)
-        pin.updateGeometryPlacements(pin_model, pin_data, pin_collision_model, gdata)
-        for k, cp_idx in enumerate(collision_pair_indices):
-            try:
-                d = pin.computeDistance(pin_collision_model, gdata, cp_idx)
-                dist_val = float(getattr(d, 'min_distance', getattr(d, 'distance', d)))
-                init_dists.append((cp_idx, dist_val))
-                print(f"[collision] pair {cp_idx} initial distance = {dist_val}")
-            except Exception as e:
-                print(f"[collision] pair {cp_idx} distance compute failed: {e}")
-    except Exception as e:
-        print("[collision] distance pre-check failed:", e)
-
-    # Keep only a few closest pairs to reduce cost of numerical differentiation
-    if init_dists:
-        init_dists.sort(key=lambda t: t[1])
-        max_pairs = min(2, len(init_dists))
-        keep = [cp for cp, _ in init_dists[:max_pairs]]
-        removed = set(collision_pair_indices) - set(keep)
-        if removed:
-            print(f"[collision] Pruning pairs (keeping {max_pairs} closest): removed {len(removed)} pairs")
-        collision_pair_indices = keep
-
-    if len(collision_pair_indices) == 0:
-        print("[collision] No collision pairs added; check frame names.")
+    pairs_chasers_link14 = add_self_collision_pairs(
+        pin_model, pin_collision_model, chasers_frames, link14_frames
+    )
+    if len(pairs_chasers_link13) == 0 or len(pairs_chasers_link14) == 0:
+        print("[collision] No collision pairs added; check frame names for chasers/link1_3/link1_4.")
     else:
-        print(f"[collision] Added {len(collision_pair_indices)} collision pairs for self-avoidance.")
+        print(
+            f"[collision] Added groups: chasers-link1_3: {len(pairs_chasers_link13)} pairs, "
+            f"chasers-link1_4: {len(pairs_chasers_link14)} pairs"
+        )
+
+    # We keep exactly two groups; no generic pruning here.
 for i in range(nsteps):
     # 每步都有一个运行代价（rcost）。
     rcost = aligator.CostStack(space, nu)
@@ -369,16 +354,16 @@ for i in range(nsteps):
     # 创建阶段模型对象stm，将该阶段的运行代价 rcost 和离散动力学模型 discrete_dynamics 绑定在一起。知道这一步怎么计算代价，也知道怎么计算动力学
     stm = aligator.StageModel(rcost, discrete_dynamics)
     # 替换为你的自定义约束 ✅
-    if args.collisions and len(collision_pair_indices) > 0:
-        # Custom residual using finite-difference Jacobians on exact mesh distances
-        class MeshPairDistanceResidual(aligator.StageFunction):
-            def __init__(self, ndx: int, nu: int, rmodel: pin.Model, gmodel: pin.GeometryModel, pair_index: int, min_dist: float):
+    if args.collisions and (len(pairs_chasers_link13) > 0 and len(pairs_chasers_link14) > 0):
+        # Group-level residual: analytic Jacobians using nearest witness pair within the group
+        class GroupMinDistanceResidual(aligator.StageFunction):
+            def __init__(self, ndx: int, nu: int, rmodel: pin.Model, gmodel: pin.GeometryModel, pair_indices: List[int], min_dist: float):
                 super().__init__(ndx, nu, 1)
                 self._ndx = ndx
                 self._nu = nu
                 self.rmodel = rmodel
                 self.gmodel = gmodel
-                self.pair_index = int(pair_index)
+                self.pair_indices = [int(i) for i in pair_indices]
                 self.min_dist = float(min_dist)
                 self.rdata = rmodel.createData()
                 self.gdata = pin.GeometryData(gmodel)
@@ -394,42 +379,128 @@ for i in range(nsteps):
                             pass
 
             def __getinitargs__(self):
-                return (self._ndx, self._nu, self.rmodel, self.gmodel, self.pair_index, self.min_dist)
+                return (self._ndx, self._nu, self.rmodel, self.gmodel, self.pair_indices, self.min_dist)
 
-            def _distance(self, q: np.ndarray) -> float:
+            def _distance_min(self, q: np.ndarray):
                 pin.forwardKinematics(self.rmodel, self.rdata, q)
+                pin.updateFramePlacements(self.rmodel, self.rdata)
                 pin.updateGeometryPlacements(self.rmodel, self.rdata, self.gmodel, self.gdata)
-                d = pin.computeDistance(self.gmodel, self.gdata, self.pair_index)
-                # Support different return types across bindings
-                return float(getattr(d, 'min_distance', getattr(d, 'distance', d)))
+                best = (+np.inf, None, None)
+                for cp_idx in self.pair_indices:
+                    dres = pin.computeDistance(self.gmodel, self.gdata, cp_idx)
+                    dval = float(getattr(dres, 'min_distance', getattr(dres, 'distance', dres)))
+                    if dval < best[0]:
+                        best = (dval, dres, cp_idx)
+                return best
 
             def evaluate(self, x: np.ndarray, u: np.ndarray, data):
                 q = x[: self.nq]
-                d = self._distance(q)
-                data.value[:] = self.min_dist - d
+                dmin, _, _ = self._distance_min(q)
+                data.value[:] = self.min_dist - dmin
 
             def computeJacobians(self, x: np.ndarray, u: np.ndarray, data):
-                q = x[: self.nq].copy()
-                eps = 1e-6
-                base = self._distance(q)
-                grad = np.zeros(self.nq)
-                for i in range(self.nq):
-                    q[i] += eps
-                    dp = self._distance(q)
-                    q[i] -= 2 * eps
-                    dm = self._distance(q)
-                    q[i] += eps  # restore
-                    ddq = (dp - dm) / (2 * eps)
-                    grad[i] = -ddq  # residual = min_dist - d(q)
+                # Analytic gradient of min distance over the group (from best pair)
+                q = x[: self.nq]
+                dmin, dres, best_cp = self._distance_min(q)
+
+                # Robustly extract nearest points in local geom frames
+                def _get_local_points(dr):
+                    # Prefer explicit getters if available
+                    try:
+                        if hasattr(dr, 'getNearestPoint1') and hasattr(dr, 'getNearestPoint2'):
+                            p1 = np.array(dr.getNearestPoint1()).reshape(3)
+                            p2 = np.array(dr.getNearestPoint2()).reshape(3)
+                            return p1, p2
+                    except Exception:
+                        pass
+                    # Try common attribute names
+                    for attr in ("nearest_points", "nearestPoints", "closest_points", "support_pointsA", "support_pointsB"):
+                        try:
+                            pts = getattr(dr, attr)
+                        except Exception:
+                            continue
+                        if attr == "support_pointsA":
+                            try:
+                                b = getattr(dr, "support_pointsB")
+                                return np.array(pts).reshape(3), np.array(b).reshape(3)
+                            except Exception:
+                                continue
+                        arr = np.array(pts)
+                        if arr.ndim == 2 and arr.shape[0] == 2:
+                            return arr[0].reshape(3), arr[1].reshape(3)
+                        if arr.ndim >= 2 and arr.shape[-2] == 2:
+                            return arr[-2].reshape(3), arr[-1].reshape(3)
+                    raise RuntimeError("Could not extract nearest points from DistanceResult.")
+
+                p1_local, p2_local = _get_local_points(dres)
+
+                # Geometry indices for the collision pair
+                pair = self.gmodel.collisionPairs[best_cp]
+                i1, i2 = pair.first, pair.second
+
+                # World witness points
+                oMg1 = self.gdata.oMg[i1]
+                oMg2 = self.gdata.oMg[i2]
+                p1_world = oMg1.act(np.asarray(p1_local).reshape(3))
+                p2_world = oMg2.act(np.asarray(p2_local).reshape(3))
+
+                # Contact normal in world; prefer provided normal if available
+                n_world = None
+                try:
+                    n = np.array(getattr(dres, 'normal')).reshape(3)
+                    if np.linalg.norm(n) > 0:
+                        n_world = n / np.linalg.norm(n)
+                except Exception:
+                    n_world = None
+                if n_world is None:
+                    if dmin != 0.0:
+                        n_world = (p2_world - p1_world) / dmin
+                    else:
+                        n_world = np.zeros(3)
+
+                # Frame Jacobians at parent frames (LOCAL_WORLD_ALIGNED)
+                fid1 = self.gmodel.geometryObjects[i1].parentFrame
+                fid2 = self.gmodel.geometryObjects[i2].parentFrame
+                RF = pin.ReferenceFrame.LOCAL_WORLD_ALIGNED
+                pin.computeJointJacobians(self.rmodel, self.rdata)
+                J6_1 = pin.getFrameJacobian(self.rmodel, self.rdata, fid1, RF)
+                J6_2 = pin.getFrameJacobian(self.rmodel, self.rdata, fid2, RF)
+
+                # Offsets from frame origins to witness points (world)
+                oMf1 = self.rdata.oMf[fid1]
+                oMf2 = self.rdata.oMf[fid2]
+                r1 = (p1_world - oMf1.translation).reshape(3)
+                r2 = (p2_world - oMf2.translation).reshape(3)
+
+                # Shift Jacobians to witness points: Jp = Jlin - [r]_x * Jang
+                def _skew(v):
+                    return np.array([[0.0, -v[2], v[1]],
+                                     [v[2], 0.0, -v[0]],
+                                     [-v[1], v[0], 0.0]])
+
+                Jlin1 = J6_1[:3, :]
+                Jang1 = J6_1[3:, :]
+                Jlin2 = J6_2[:3, :]
+                Jang2 = J6_2[3:, :]
+
+                Jp1 = Jlin1 - _skew(r1) @ Jang1
+                Jp2 = Jlin2 - _skew(r2) @ Jang2
+
+                # Gradient of distance wrt q: n^T (Jp2 - Jp1)
+                dd_dq = n_world @ (Jp2 - Jp1)
+                # Residual r = min_dist - d(q) => dr/dq = -dd_dq
+                grad = -dd_dq.reshape(-1)
+
                 # Fill Jacobians: d(res)/dx and d(res)/du
                 data.Jx[:] = 0.0
                 data.Jx[: self.nq] = grad
                 data.Ju[:] = 0.0
 
-        # Add constraints for each selected pair
-        for cp_idx in collision_pair_indices:
-            coll_res = MeshPairDistanceResidual(ndx, nu, pin_model, pin_collision_model, cp_idx, min_self_distance)
-            stm.addConstraint(coll_res, constraints.NegativeOrthant())  # residual <= 0
+        # Add two group-level constraints
+        coll_res_13 = GroupMinDistanceResidual(ndx, nu, pin_model, pin_collision_model, pairs_chasers_link13, min_self_distance)
+        coll_res_14 = GroupMinDistanceResidual(ndx, nu, pin_model, pin_collision_model, pairs_chasers_link14, min_self_distance)
+        stm.addConstraint(coll_res_13, constraints.NegativeOrthant())  # residual <= 0
+        stm.addConstraint(coll_res_14, constraints.NegativeOrthant())  # residual <= 0
         
     if args.bounds:
         # 这儿为什么要加*，是因为make_control_bounds()返回的是一个元组，元组中的第一个元素是一个函数，第二个元素是一个约束集。而 addConstraint 期望的是两个参数，所以需要解包。
@@ -452,7 +523,7 @@ cb = aligator.HistoryCallback(solver)
 solver.registerCallback("his", cb)
 solver.setNumThreads(8)
 if args.collisions:
-    # Finite-difference collision residuals are not thread-safe; use single thread
+    # Collision residuals use shared Pinocchio/FCL data; keep single-thread for safety
     solver.setNumThreads(1)
 solver.setup(problem)
 
