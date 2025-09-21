@@ -194,26 +194,91 @@ class DoublePendulumDynamics(dynamics.ODEAbstract):
         data.Jxdot.fill(0.0)
         np.fill_diagonal(data.Jxdot, -1.0)
 
-        eps = self._fd_eps
-        ndx = self._space.ndx
-        dx = np.zeros(ndx)
-        for i in range(ndx):
-            dx[i] = eps
-            xp = self._space.integrate(x, dx)
-            xm = self._space.integrate(x, -dx)
-            fp = self._vector_field(xp, u)
-            fm = self._vector_field(xm, u)
-            data.Jx[:, i] = (fp - fm) / (2.0 * eps)
-            dx[i] = 0.0
+        # Unpack state and control
+        th1, th2, w1, w2 = x
+        tau1, tau2 = u
+        p = self.params
 
-        nu = self.params.nu
-        du = np.zeros(nu)
-        for j in range(nu):
-            du[j] = eps
-            fp = self._vector_field(x, u + du)
-            fm = self._vector_field(x, u - du)
-            data.Ju[:, j] = (fp - fm) / (2.0 * eps)
-            du[j] = 0.0
+        # Precompute trigs and constants
+        s2 = math.sin(th2)
+        c2 = math.cos(th2)
+        cos1 = math.cos(th1)
+        cos12 = math.cos(th1 + th2)
+        h = p.m2 * p.l1 * p.lc2
+
+        # Mass matrix M(th2) matching _vector_field
+        m11 = p.I1 + p.I2 + p.m1 * p.lc1**2 + p.m2 * (p.l1**2 + p.lc2**2 + 2.0 * h * c2)
+        m12 = p.I2 + p.m2 * (p.lc2**2 + h * c2)
+        m22 = p.I2 + p.m2 * p.lc2**2
+        M = np.array([[m11, m12], [m12, m22]], dtype=float)
+        Minv = np.linalg.inv(M)
+
+        # Nonlinear terms matching _vector_field
+        c1 = -h * s2 * (2.0 * w1 * w2 + w2**2)
+        c2_term = h * s2 * w1**2
+        C = np.array([c1, c2_term], dtype=float)
+
+        alpha = (p.m1 * p.lc1 + p.m2 * p.l1) * p.gravity
+        beta = p.m2 * p.lc2 * p.gravity
+        g1 = alpha * math.sin(th1) + beta * math.sin(th1 + th2)
+        g2 = beta * math.sin(th1 + th2)
+        G = np.array([g1, g2], dtype=float)
+
+        F = np.array([p.damping1 * w1, p.damping2 * w2], dtype=float)
+        tau = np.array([tau1, tau2], dtype=float)
+
+        r = tau - C - G - F
+        ddq = Minv @ r
+
+        # xdot = [w1, w2, ddq]
+        # Top rows: d(w1,w2)/dx
+        data.Jx[0, 2] = 1.0
+        data.Jx[1, 3] = 1.0
+
+        # dr/dx terms
+        # d r / d th1
+        dr_dth1 = np.array([
+            - (alpha * cos1 + beta * cos12),
+            - (beta * cos12),
+        ], dtype=float)
+
+        # d r / d th2
+        dr_dth2 = np.array([
+            h * c2 * (2.0 * w1 * w2 + w2**2) - beta * cos12,
+            - h * c2 * w1**2 - beta * cos12,
+        ], dtype=float)
+
+        # d r / d w1
+        dr_dw1 = np.array([
+            2.0 * h * s2 * w2 - p.damping1,
+            -2.0 * h * s2 * w1,
+        ], dtype=float)
+
+        # d r / d w2
+        dr_dw2 = np.array([
+            2.0 * h * s2 * (w1 + w2),
+            -p.damping2,
+        ], dtype=float)
+
+        # d M / d th2 (only dependence via c2)
+        dM_dth2 = np.array([
+            [-2.0 * p.m2 * h * s2, -p.m2 * h * s2],
+            [-p.m2 * h * s2, 0.0],
+        ], dtype=float)
+
+        # Compose d(ddq)/dx using d(M^{-1} r) = M^{-1} (dr - dM ddq)
+        dddq_dth1 = Minv @ dr_dth1
+        dddq_dth2 = Minv @ (dr_dth2 - dM_dth2 @ ddq)
+        dddq_dw1 = Minv @ dr_dw1
+        dddq_dw2 = Minv @ dr_dw2
+
+        data.Jx[2:, 0] = dddq_dth1
+        data.Jx[2:, 1] = dddq_dth2
+        data.Jx[2:, 2] = dddq_dw1
+        data.Jx[2:, 3] = dddq_dw2
+
+        # Control Jacobian: d r / d u = I, so d ddq / d u = M^{-1}
+        data.Ju[2:, :] = Minv
 
     def _vector_field(self, x: np.ndarray, u: np.ndarray) -> np.ndarray:
         th1, th2, w1, w2 = x
