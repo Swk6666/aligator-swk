@@ -168,11 +168,13 @@ class DoublePendulumParams:
         self.nu = 2
 
 
-class DoublePendulumDynamics(dynamics.ODEAbstract):
+class DoublePendulumDynamics(dynamics.ODEAbstract):  #继承自aligator.dynamics.ODEAbstract
     """Continuous dynamics for a torque-controlled planar double pendulum."""
 
     def __init__(self, space: manifolds.ManifoldAbstract, params: DoublePendulumParams):
+        # super().__init__(...) 的意思是：“找到我的父类（也就是 ODEAbstract），然后调用它的 __init__ 构造函数，并把括号里的参数传给它。
         super().__init__(space, params.nu)
+        
         self._space = space
         self.params = params
         self._fd_eps = 1e-6
@@ -182,11 +184,12 @@ class DoublePendulumDynamics(dynamics.ODEAbstract):
         return self
 
     def forward(self, x: np.ndarray, u: np.ndarray, data: dynamics.ODEData) -> None:
+        """Aligator 调用的标准接口。它简单地调用 _vector_field 并将结果存入 Aligator 提供的数据结构中。"""
         data.xdot[:] = self._vector_field(x, u)
         data.value[:] = 0.0
 
     def dForward(self, x: np.ndarray, u: np.ndarray, data: dynamics.ODEData) -> None:
-        # Ensure the current vector field is up to date before building Jacobians.
+        """计算x_dot，还计算了动力学方程关于状态x和控制u的雅可比矩阵"""
         data.xdot[:] = self._vector_field(x, u)
         data.value[:] = 0.0
         data.Jx.fill(0.0)
@@ -281,6 +284,7 @@ class DoublePendulumDynamics(dynamics.ODEAbstract):
         data.Ju[2:, :] = Minv
 
     def _vector_field(self, x: np.ndarray, u: np.ndarray) -> np.ndarray:
+        """实现了双摆的动力学方程，计算给定状态x和控制u下,状态的变化率x_dot"""
         th1, th2, w1, w2 = x
         tau1, tau2 = u
         p = self.params
@@ -318,14 +322,14 @@ class DoublePendulumDynamics(dynamics.ODEAbstract):
 
 
 class Args(tap.Tap):
-    dt: float = 0.02
-    horizon: float = 4.0
-    plot: bool = False
-    integrator: str = "rk2"
+    dt: float = 0.002
+    horizon: float = 5.0
+    plot: bool = True
+    integrator: str = "semieuler"
     max_iters: int = 200
-    display: bool = False
+    display: bool = True
     zmq_url: Optional[str] = None
-    loop_display: bool = False
+    loop_display: bool = True
 
     def process_args(self) -> None:
         if self.integrator not in {"euler", "semieuler", "rk2", "midpoint"}:
@@ -333,9 +337,6 @@ class Args(tap.Tap):
         if self.zmq_url is not None and self.zmq_url.lower() == "none":
             self.zmq_url = None
 
-    def configure(self) -> None:
-        # Allow both `--loop_display` and `--loop-display` for convenience.
-        self.add_argument("--loop-display", dest="loop_display", action="store_true")
 
 
 def make_integrator(kind: str, ode: dynamics.ODEAbstract, dt: float):
@@ -376,7 +377,7 @@ def main() -> None:
 
     running_cost = aligator.CostStack(space, nu)
     Q = np.diag([50.0, 25.0, 1.0, 1.0]) * args.dt
-    R = np.diag([5e-3, 5e-3]) * args.dt
+    R = np.diag([5e-1, 5e-1]) * args.dt
     running_cost.addCost(
         "state",
         aligator.QuadraticStateCost(space, nu, x_target, Q),
