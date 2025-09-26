@@ -18,7 +18,7 @@ class Args(ArgsBase):
     fddp: bool = False
     bounds: bool = True
     collisions: bool = False
-    display: bool = True
+    display: bool = False
 
 
 args = Args().parse_args()
@@ -275,13 +275,19 @@ frame_fn = aligator.FramePlacementResidual(ndx, nu, pin_model, target_pose, tool
 v_ref = pin.Motion()
 v_ref.np[:] = 0.0 #.np 是一个方便的接口，它返回一个指向 Motion 对象内部数据的 NumPy 视图（view）。这允许我们使用高效的 NumPy 操作来读写其内容。
 
-wt_x = 1e-4 * np.ones(ndx)
-wt_x[nv:] = 0.1
-wt_x = np.diag(wt_x)
+wt_state = 1e-4 * np.ones(ndx)
+# 不对自由基的配置/速度施加正则
+wt_state[:6] = 0.0
+wt_state[nv:nv + 6] = 0.0
+# 手臂关节速度保持较强正则
+wt_state[nv + 6:] = 0.1
+wt_x = np.diag(wt_state)
 wt_u = 1e-2 * np.eye(nu)
 ##终端状态的权重
+terminal_state_scale = 10.0
 wt_x_term = wt_x.copy()
-wt_x_term[:] = 1e-4
+diag_idx = np.diag_indices(ndx)
+wt_x_term[diag_idx] *= terminal_state_scale
 
 # 控制正则化残差
 control_reg_fn = aligator.ControlErrorResidual(ndx, nu)
@@ -295,9 +301,9 @@ frame_vel_fn = aligator.FrameVelocityResidual(
 ## 特定任务的权重，这里指的是末端执行器到达目标点的任务
 # frame_fn.nr is now 6 (3 for pos, 3 for ori)
 wt_frame_pose = np.eye(frame_fn.nr)
-wt_frame_pose[:3, :3] = 10 * np.eye(3)  # Position weight
-wt_frame_pose[3:, 3:] = 10 * np.eye(3)  # Orientation weight
-wt_frame_vel = 10*np.ones(frame_vel_fn.nr) #nr是速度残差项的维度6
+wt_frame_pose[:3, :3] = 200 * np.eye(3)  # Position weight
+wt_frame_pose[3:, 3:] = 50 * np.eye(3)  # Orientation weight
+wt_frame_vel = 50 * np.ones(frame_vel_fn.nr)  # nr是速度残差项的维度6
 wt_frame_vel = np.diag(wt_frame_vel)
 
 ## 定义一个代价函数，用于描述机器人的状态和控制
@@ -601,6 +607,24 @@ print(results)
 xs_opt = results.xs.tolist()
 us_opt = np.asarray(results.us.tolist())
 times = np.linspace(0.0, tf, nsteps + 1)
+
+# 末端位姿对比
+q_final = xs_opt[-1][:nq]
+pin.forwardKinematics(pin_model, pin_data, q_final)
+pin.updateFramePlacements(pin_model, pin_data)
+final_pose = pin_data.oMf[tool_id]
+actual_pos = final_pose.translation.copy()
+actual_quat = pin.Quaternion(final_pose.rotation)
+actual_quat.normalize()
+actual_quat_coeffs = np.array(actual_quat.coeffs()).reshape(4)
+target_quat_coeffs = np.array(target_quat.coeffs()).reshape(4)
+print("\n=== 末端位姿对比 ===")
+print(f"实际位置: {actual_pos}")
+print(f"期望位置: {target_pos}")
+print(f"位置误差: {actual_pos - target_pos}")
+print(f"实际姿态(四元数 [x, y, z, w]): {actual_quat_coeffs}")
+print(f"期望姿态(四元数 [x, y, z, w]): {target_quat_coeffs}")
+
 
 if args.plot:
     # --- 绘图 ---
