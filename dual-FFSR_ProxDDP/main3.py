@@ -1,4 +1,4 @@
-## 初始化pinocchio，固定基机器人，做了一个reach的任务，没有考虑姿态
+## 初始化 pinocchio，漂浮基双臂机器人做 reach 任务
 import numpy as np
 import os
 import pinocchio as pin
@@ -14,11 +14,13 @@ from typing import List
 # # 示例1：启用碰撞检测和控制约束
 #python script.py --collisions --bounds
 class Args(ArgsBase):
-    plot: bool = False
-    fddp: bool = False
-    bounds: bool = True
-    collisions: bool = False
-    display: bool = False
+    """命令行参数：复用 examples 基类，默认关闭绘图显示。"""
+
+    plot: bool = False       # 是否绘制结果图
+    fddp: bool = False       # 是否切换成 FDDP 求解器
+    bounds: bool = True      # 是否启用控制输入盒约束
+    collisions: bool = False # 是否启用自碰撞最小距离约束
+    display: bool = True    # 是否开启 Meshcat 实时可视化
 
 
 args = Args().parse_args()
@@ -30,8 +32,10 @@ if os.environ.get("COLLISIONS", "").lower() in ("1", "true", "yes"):
     args.collisions = True
 
 print(args)
+# 两臂标称姿态，用作初始关节角写入 neutral 配置
 desired_qpos_arm1 = np.array([-1.6591, -0.8973, -0.2357,  1.1626, -1.9025, -0.5507,  0.8034])
 desired_qpos_arm2 = np.array([-2.209,  -0.5691,  0.3233,  1.1195, -2.0471, -0.0263,  0.7434]) 
+# 关节名称列表：构建驱动矩阵以及写入配置时使用
 arm1_joint_names = [f"joint1_{i}" for i in range(1, 8)]
 arm2_joint_names = [f"joint2_{i}" for i in range(1, 8)]
 actuated_joint_names = arm1_joint_names + arm2_joint_names
@@ -182,7 +186,7 @@ def create_weld_constraint(pin_model: pin.Model, pin_data: pin.Data, ref_q0: np.
     return rcm
 
 # 构造包含自由基座的初始关节配置
-initial_q = pin.neutral(pin_model).copy()
+initial_q = pin.neutral(pin_model).copy()  # 漂浮基模型的中性位姿（基座自由度位于前 7 项）
 
 
 def _set_joint_positions(model: pin.Model, q_vec: np.ndarray, joint_names: List[str], target_values: np.ndarray):
@@ -202,9 +206,9 @@ _set_joint_positions(pin_model, initial_q, arm2_joint_names, desired_qpos_arm2)
 weld_constraint = create_weld_constraint(pin_model, pin_data, initial_q.copy())
 
 
-dt = 0.01
+dt = 0.01      # 时间步长（秒）
 tf = 10.0
-nsteps = int(tf / dt)
+nsteps = int(tf / dt)  # 离散步数
 space = manifolds.MultibodyPhaseSpace(pin_model)
 ## 状态的维度
 ndx = space.ndx
@@ -217,7 +221,7 @@ nv = pin_model.nv # nv是速度空间的维度
 print("nv", nv)
 nu = len(actuated_joint_names)  # 控制输入的维度（14个手臂关节被驱动）
 print("nu", nu)
-q0 = initial_q.copy()
+q0 = initial_q.copy()  # 初始配置：自由基 + 双臂关节
 print("q0", q0)
 x0 = np.concatenate([q0, np.zeros(nv)])
 print("x0", x0.shape)
@@ -228,7 +232,7 @@ pin.forwardKinematics(pin_model, pin_data, q0)
 pin.updateFramePlacements(pin_model, pin_data)
 
 # 驱动矩阵：将控制输入映射到关节空间（自由基座不驱动）
-actuation_matrix = np.zeros((nv, nu))
+actuation_matrix = np.zeros((nv, nu))  # 每列对应一个关节，行索引对齐模型速度向量
 for col, joint_name in enumerate(actuated_joint_names):
     joint_id = pin_model.getJointId(joint_name)
     idx_v = pin_model.idx_vs[joint_id]
@@ -260,12 +264,11 @@ initial_pos = pin_data.oMf[tool_id].translation.copy()
 print(f"Initial position of the object: {initial_pos}")
 
 # For debugging, set the target to the initial position (stay-in-place task)
-# target_pos = np.array([3, 1.3, 0.7])
-target_pos = initial_pos.copy()
+# 世界坐标系下的末端目标位置（米）
 target_pos = np.array([3, 1.3, 0.7])
 print(f"Target position set to: {target_pos}")
 
-# Define target orientation (w, x, y, z) -> (1, 0, 0, 0) is identity
+# 目标姿态（四元数 w,x,y,z）；保证归一化
 target_quat = pin.Quaternion(-0.8924, -0.2391, -0.099, -0.3696).normalized()
 target_pose = pin.SE3(target_quat, target_pos)
 print(f"Target pose set to: {target_pose}")
@@ -275,16 +278,19 @@ frame_fn = aligator.FramePlacementResidual(ndx, nu, pin_model, target_pose, tool
 v_ref = pin.Motion()
 v_ref.np[:] = 0.0 #.np 是一个方便的接口，它返回一个指向 Motion 对象内部数据的 NumPy 视图（view）。这允许我们使用高效的 NumPy 操作来读写其内容。
 
+# 末端位置残差用于终端约束（只考虑平移）
+frame_pos_cstr_fn = aligator.FrameTranslationResidual(ndx, nu, pin_model, target_pos, tool_id)
+
 wt_state = 1e-4 * np.ones(ndx)
-# 不对自由基的配置/速度施加正则
+# 不对自由基的配置/速度施加正则（漂浮基可主动调整轨道）
 wt_state[:6] = 0.0
 wt_state[nv:nv + 6] = 0.0
-# 手臂关节速度保持较强正则
+# 手臂关节速度保持较强正则（抑制振荡）
 wt_state[nv + 6:] = 0.1
 wt_x = np.diag(wt_state)
 wt_u = 1e-2 * np.eye(nu)
 ##终端状态的权重
-terminal_state_scale = 10.0
+terminal_state_scale = 10.0  # 终端阶段权重放大因子
 wt_x_term = wt_x.copy()
 diag_idx = np.diag_indices(ndx)
 wt_x_term[diag_idx] *= terminal_state_scale
@@ -301,9 +307,9 @@ frame_vel_fn = aligator.FrameVelocityResidual(
 ## 特定任务的权重，这里指的是末端执行器到达目标点的任务
 # frame_fn.nr is now 6 (3 for pos, 3 for ori)
 wt_frame_pose = np.eye(frame_fn.nr)
-wt_frame_pose[:3, :3] = 200 * np.eye(3)  # Position weight
-wt_frame_pose[3:, 3:] = 50 * np.eye(3)  # Orientation weight
-wt_frame_vel = 50 * np.ones(frame_vel_fn.nr)  # nr是速度残差项的维度6
+wt_frame_pose[:3, :3] = 200 * np.eye(3)  # 末端位置误差权重
+wt_frame_pose[3:, 3:] = 50 * np.eye(3)  # 末端姿态误差权重
+wt_frame_vel = 50 * np.ones(frame_vel_fn.nr)  # 末端速度权重
 wt_frame_vel = np.diag(wt_frame_vel)
 
 ## 定义一个代价函数，用于描述机器人的状态和控制
@@ -323,14 +329,14 @@ term_cost.addCost(
     "vel", aligator.QuadraticResidualCost(space, frame_vel_fn, wt_frame_vel)
 )
 # 控制输入的边界约束（仅作用于被驱动的14个关节）
-effort_limits = []
+effort_limits = []  # 逐个关节收集模型给出的扭矩极限
 for joint_name in actuated_joint_names:
     joint_id = pin_model.getJointId(joint_name)
     idx_v = pin_model.idx_vs[joint_id]
     width = pin_model.nvs[joint_id]
     effort_limits.extend(pin_model.effortLimit[idx_v:idx_v + width])
 effort_limits = np.asarray(effort_limits)
-u_max = 0.04 * effort_limits
+u_max = 0.04 * effort_limits  # 按 4% 缩放限制，防止优化出极端力矩
 u_min = -u_max
 print("u_max", u_max)
 
@@ -349,7 +355,7 @@ def make_control_bounds():
 # We must use the result from `aligator.underactuatedConstrainedInverseDynamics` (`u0`) which correctly
 # accounts for the weld constraint.
 print("Using constrained inverse dynamics for a physically consistent initial guess.")
-init_us = [u0.copy() for _ in range(nsteps)]
+init_us = [u0.copy() for _ in range(nsteps)]  # 使用约束逆动力学得到的静态解作为每步初值
 init_xs = aligator.rollout(discrete_dynamics, x0, init_us)
 
 #这部分代码在一个循环中构建了 nsteps 个阶段模型（Stage Model），并将它们存储在列表 stages 中。每个阶段模型 stm 描述了在轨迹中的一个时间步k的目标，约束和动力学
@@ -566,11 +572,21 @@ for i in range(nsteps):
 
 
 problem = aligator.TrajOptProblem(x0, stages, term_cost=term_cost)
-tol = 1e-5
 
-mu_init = 1e-4
-verbose = aligator.VerboseLevel.VERBOSE
-max_iters = 500
+# 末端位置不等式约束：|p_final - p_target| <= pos_tol
+pos_tol = 0.002  # 末端位置容差（米）：目标点 ±2 cm
+pos_lower = -pos_tol * np.ones(frame_pos_cstr_fn.nr)
+pos_upper = pos_tol * np.ones(frame_pos_cstr_fn.nr)
+problem.addTerminalConstraint(frame_pos_cstr_fn, constraints.BoxConstraint(pos_lower, pos_upper))
+tol = 1e-5            # 终止容差（原始/对偶残差）
+
+mu_init = 1e-4        # Prox DDP 罚因子初值
+# verbose 选项：
+# - aligator.VerboseLevel.QUIET: 静默模式，不输出任何信息
+# - aligator.VerboseLevel.VERBOSE: 详细输出，显示每次迭代的信息
+# - aligator.VerboseLevel.VERYVERBOSE: 非常详细的输出，包含更多调试信息
+verbose = aligator.VerboseLevel.QUIET
+max_iters = 350       # 允许最大迭代次数
 solver = aligator.SolverProxDDP(tol, mu_init, max_iters=max_iters, verbose=verbose)
 solver.rollout_type = aligator.ROLLOUT_NONLINEAR
 solver.sa_strategy = aligator.SA_LINESEARCH_NONMONOTONE
