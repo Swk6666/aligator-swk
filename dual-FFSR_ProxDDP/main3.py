@@ -17,7 +17,7 @@ class Args(ArgsBase):
     plot: bool = False
     fddp: bool = False
     bounds: bool = True
-    collisions: bool = True
+    collisions: bool = False
     display: bool = True
 
 
@@ -32,6 +32,9 @@ if os.environ.get("COLLISIONS", "").lower() in ("1", "true", "yes"):
 print(args)
 desired_qpos_arm1 = np.array([-1.6591, -0.8973, -0.2357,  1.1626, -1.9025, -0.5507,  0.8034])
 desired_qpos_arm2 = np.array([-2.209,  -0.5691,  0.3233,  1.1195, -2.0471, -0.0263,  0.7434]) 
+arm1_joint_names = [f"joint1_{i}" for i in range(1, 8)]
+arm2_joint_names = [f"joint2_{i}" for i in range(1, 8)]
+actuated_joint_names = arm1_joint_names + arm2_joint_names
 # 加载机器人模型
 pin_model, pin_collision_model, pin_visual_model = pin.buildModelsFromMJCF("dual-FFSR_ProxDDP/xml/dual_arm_space_robot_add_object.xml")
 pin_model.gravity.linear[:] = 0
@@ -178,13 +181,27 @@ def create_weld_constraint(pin_model: pin.Model, pin_data: pin.Data, ref_q0: np.
     
     return rcm
 
+# 构造包含自由基座的初始关节配置
+initial_q = pin.neutral(pin_model).copy()
+
+
+def _set_joint_positions(model: pin.Model, q_vec: np.ndarray, joint_names: List[str], target_values: np.ndarray):
+    """将给定关节的位姿写入配置向量。"""
+    for joint_name, value in zip(joint_names, target_values):
+        joint_id = model.getJointId(joint_name)
+        idx = model.idx_qs[joint_id]
+        width = model.nqs[joint_id]
+        q_vec[idx:idx + width] = value
+    return q_vec
+
+
+_set_joint_positions(pin_model, initial_q, arm1_joint_names, desired_qpos_arm1)
+_set_joint_positions(pin_model, initial_q, arm2_joint_names, desired_qpos_arm2)
+
 # 创建weld约束
-weld_constraint = create_weld_constraint(pin_model, pin_data, np.concatenate([desired_qpos_arm1, desired_qpos_arm2]))
+weld_constraint = create_weld_constraint(pin_model, pin_data, initial_q.copy())
 
 
-
-
-initial_q = np.concatenate([desired_qpos_arm1, desired_qpos_arm2])
 dt = 0.01
 tf = 10.0
 nsteps = int(tf / dt)
@@ -192,23 +209,31 @@ space = manifolds.MultibodyPhaseSpace(pin_model)
 ## 状态的维度
 ndx = space.ndx
 print("ndx", ndx)
+nx = space.nx
+print("nx", nx)
 nq = pin_model.nq # nq是配置空间的维度
 print("nq", nq)
 nv = pin_model.nv # nv是速度空间的维度
 print("nv", nv)
-nu = nv # nu是控制输入的维度
+nu = len(actuated_joint_names)  # 控制输入的维度（14个手臂关节被驱动）
 print("nu", nu)
-q0 = initial_q[:nq]
+q0 = initial_q.copy()
 print("q0", q0)
 x0 = np.concatenate([q0, np.zeros(nv)])
 print("x0", x0.shape)
+x_ref = x0.copy()
 
 # Run FK to get initial ee position for setting the target
 pin.forwardKinematics(pin_model, pin_data, q0)
 pin.updateFramePlacements(pin_model, pin_data)
 
-# 驱动矩阵：将控制输入映射到关节空间
-actuation_matrix = np.eye(14, 14)  # 12x6矩阵，前6行为单位矩阵，后6行为零
+# 驱动矩阵：将控制输入映射到关节空间（自由基座不驱动）
+actuation_matrix = np.zeros((nv, nu))
+for col, joint_name in enumerate(actuated_joint_names):
+    joint_id = pin_model.getJointId(joint_name)
+    idx_v = pin_model.idx_vs[joint_id]
+    width = pin_model.nvs[joint_id]
+    actuation_matrix[idx_v:idx_v + width, col] = 1.0
 # 约束求解器设置
 prox_settings = pin.ProximalSettings(accuracy=1e-8, mu=1e-6, max_iter=20)
 # 1. 带约束的动力学（抓取阶段）
@@ -223,12 +248,12 @@ discrete_dynamics = dynamics.IntegratorSemiImplEuler(ode, dt)  # 约束动力学
 # 方法2：约束系统的逆动力学
 u0, lam_c = aligator.underactuatedConstrainedInverseDynamics(
     pin_model, pin_data,           # 模型和数据
-    initial_q, np.zeros(14),                  # 初始状态
+    initial_q, np.zeros(nv),                  # 初始状态
     actuation_matrix,        # 驱动矩阵
     [weld_constraint],                   # 约束模型
     [weld_constraint.createData()]       # 约束数据
 )
-assert u0.shape == (14,)     # 确保控制输入维度正确（6维）
+assert u0.shape == (nu,)     # 确保控制输入维度正确
 #定义一个末端位置的残差项
 tool_id = pin_model.getFrameId("object")
 initial_pos = pin_data.oMf[tool_id].translation.copy()
@@ -258,6 +283,9 @@ wt_u = 1e-2 * np.eye(nu)
 wt_x_term = wt_x.copy()
 wt_x_term[:] = 1e-4
 
+# 控制正则化残差
+control_reg_fn = aligator.ControlErrorResidual(ndx, nu)
+
 
 
 #定义一个末端速度的残差项
@@ -276,7 +304,10 @@ wt_frame_vel = np.diag(wt_frame_vel)
 #aligator.CostStack 是一个容器，它可以将多个独立的代价函数项“堆叠”在一起，形成一个总的代价函数。当你向 CostStack 添加多个代价项时，它会自动将它们求和，并正确地计算总代价的梯度（gradient）和海森矩阵（Hessian matrix）。
 term_cost = aligator.CostStack(space, nu)
 # 第一部分代价，终端代价，不考虑控制输入
-term_cost.addCost("reg", aligator.QuadraticCost(wt_x_term, wt_u * 0))
+term_cost.addCost(
+    "reg", aligator.QuadraticStateCost(space, nu, x_ref, wt_x_term)
+)
+# 终端不惩罚控制，因此不添加控制正则项
 # 第二部分代价，位置残差代价
 term_cost.addCost(
     "frame", aligator.QuadraticResidualCost(space, frame_fn, wt_frame_pose)
@@ -285,8 +316,15 @@ term_cost.addCost(
 term_cost.addCost(
     "vel", aligator.QuadraticResidualCost(space, frame_vel_fn, wt_frame_vel)
 )
-# 控制输入的边界约束
-u_max = 0.04*pin_model.effortLimit
+# 控制输入的边界约束（仅作用于被驱动的14个关节）
+effort_limits = []
+for joint_name in actuated_joint_names:
+    joint_id = pin_model.getJointId(joint_name)
+    idx_v = pin_model.idx_vs[joint_id]
+    width = pin_model.nvs[joint_id]
+    effort_limits.extend(pin_model.effortLimit[idx_v:idx_v + width])
+effort_limits = np.asarray(effort_limits)
+u_max = 0.04 * effort_limits
 u_min = -u_max
 print("u_max", u_max)
 
@@ -350,7 +388,12 @@ for i in range(nsteps):
     # 每步都有一个运行代价（rcost）。
     rcost = aligator.CostStack(space, nu)
     # 运行代价包括状态和控制输入的代价，使用预定义的权重 wt_x 和 wt_u。
-    rcost.addCost("reg", aligator.QuadraticCost(wt_x * dt, wt_u * dt))
+    rcost.addCost(
+        "reg", aligator.QuadraticStateCost(space, nu, x_ref, wt_x * dt)
+    )
+    rcost.addCost(
+        "ureg", aligator.QuadraticResidualCost(space, control_reg_fn, wt_u * dt)
+    )
     # 创建阶段模型对象stm，将该阶段的运行代价 rcost 和离散动力学模型 discrete_dynamics 绑定在一起。知道这一步怎么计算代价，也知道怎么计算动力学
     stm = aligator.StageModel(rcost, discrete_dynamics)
     # 替换为你的自定义约束 ✅
@@ -394,14 +437,22 @@ for i in range(nsteps):
                 return best
 
             def evaluate(self, x: np.ndarray, u: np.ndarray, data):
-                q = x[: self.nq]
-                dmin, _, _ = self._distance_min(q)
-                data.value[:] = self.min_dist - dmin
+                try:
+                    q = x[: self.nq]
+                    dmin, _, _ = self._distance_min(q)
+                    data.value[:] = self.min_dist - dmin
+                except Exception as exc:
+                    print("[collision] evaluate failed:", exc)
+                    raise
 
             def computeJacobians(self, x: np.ndarray, u: np.ndarray, data):
                 # Analytic gradient of min distance over the group (from best pair)
-                q = x[: self.nq]
-                dmin, dres, best_cp = self._distance_min(q)
+                try:
+                    q = x[: self.nq]
+                    dmin, dres, best_cp = self._distance_min(q)
+                except Exception as exc:
+                    print("[collision] jacobian failed:", exc)
+                    raise
 
                 # Robustly extract nearest points in local geom frames
                 def _get_local_points(dr):
@@ -529,7 +580,13 @@ solver.setup(problem)
 
 # 计时优化过程
 start_time = time.time()
-solver.run(problem, init_xs, init_us)
+try:
+    solver.run(problem, init_xs, init_us)
+except Exception as exc:
+    import traceback
+    print("\n[ERROR] 求解过程中捕获异常：")
+    traceback.print_exc()
+    raise
 solve_time = time.time() - start_time
 print(f"\n=== 求解性能 ===")
 print(f"求解时间: {solve_time:.2f} 秒")

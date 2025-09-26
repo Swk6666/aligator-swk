@@ -34,6 +34,7 @@
 
     <body name="chasersat" pos="0 0 0">
     <inertial pos="0 0 0" mass="5000" diaginertia="12000 12000 12000" />
+      <freejoint name="base_free"/>
       <geom name="base01" type="mesh" rgba="0.529412 0.54902 0.54902 1" mesh="base_link"/>
       <geom name="link01" pos="1.2 0.5021 1.002" quat="0.00706421 0.0029261 -0.382673 -0.923852" type="mesh" rgba="0 0.4235 0.3294 1" mesh="link0"/>
       <geom name="link02" pos="1.18 -0.5024 -1.002" quat="3.68624e-05 -8.89945e-05 -0.923881 0.382681" type="mesh" rgba="0.792157 0.819608 0.933333 1" mesh="link0"/>
