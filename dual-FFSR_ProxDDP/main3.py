@@ -20,7 +20,7 @@ class Args(ArgsBase):
     fddp: bool = False       # 是否切换成 FDDP 求解器
     bounds: bool = True      # 是否启用控制输入盒约束
     collisions: bool = False # 是否启用自碰撞最小距离约束
-    display: bool = True    # 是否开启 Meshcat 实时可视化
+    display: bool = False    # 是否开启 Meshcat 实时可视化
 
 
 args = Args().parse_args()
@@ -212,19 +212,19 @@ nsteps = int(tf / dt)  # 离散步数
 space = manifolds.MultibodyPhaseSpace(pin_model)
 ## 状态的维度
 ndx = space.ndx
-print("ndx", ndx)
+
 nx = space.nx
-print("nx", nx)
+
 nq = pin_model.nq # nq是配置空间的维度
-print("nq", nq)
+
 nv = pin_model.nv # nv是速度空间的维度
-print("nv", nv)
+
 nu = len(actuated_joint_names)  # 控制输入的维度（14个手臂关节被驱动）
-print("nu", nu)
+
 q0 = initial_q.copy()  # 初始配置：自由基 + 双臂关节
-print("q0", q0)
+
 x0 = np.concatenate([q0, np.zeros(nv)])
-print("x0", x0.shape)
+
 x_ref = x0.copy()
 
 # Run FK to get initial ee position for setting the target
@@ -261,25 +261,22 @@ assert u0.shape == (nu,)     # 确保控制输入维度正确
 #定义一个末端位置的残差项
 tool_id = pin_model.getFrameId("object")
 initial_pos = pin_data.oMf[tool_id].translation.copy()
-print(f"Initial position of the object: {initial_pos}")
+
 
 # For debugging, set the target to the initial position (stay-in-place task)
 # 世界坐标系下的末端目标位置（米）
 target_pos = np.array([3, 1.3, 0.7])
-print(f"Target position set to: {target_pos}")
+
 
 # 目标姿态（四元数 w,x,y,z）；保证归一化
 target_quat = pin.Quaternion(-0.8924, -0.2391, -0.099, -0.3696).normalized()
 target_pose = pin.SE3(target_quat, target_pos)
-print(f"Target pose set to: {target_pose}")
+
 
 
 frame_fn = aligator.FramePlacementResidual(ndx, nu, pin_model, target_pose, tool_id)
 v_ref = pin.Motion()
 v_ref.np[:] = 0.0 #.np 是一个方便的接口，它返回一个指向 Motion 对象内部数据的 NumPy 视图（view）。这允许我们使用高效的 NumPy 操作来读写其内容。
-
-# 末端位置残差用于终端约束（只考虑平移）
-frame_pos_cstr_fn = aligator.FrameTranslationResidual(ndx, nu, pin_model, target_pos, tool_id)
 
 wt_state = 1e-4 * np.ones(ndx)
 # 不对自由基的配置/速度施加正则（漂浮基可主动调整轨道）
@@ -336,7 +333,7 @@ for joint_name in actuated_joint_names:
     width = pin_model.nvs[joint_id]
     effort_limits.extend(pin_model.effortLimit[idx_v:idx_v + width])
 effort_limits = np.asarray(effort_limits)
-u_max = 0.04 * effort_limits  # 按 4% 缩放限制，防止优化出极端力矩
+u_max = 0.05 * effort_limits  # 按 4% 缩放限制，防止优化出极端力矩
 u_min = -u_max
 print("u_max", u_max)
 
@@ -573,20 +570,22 @@ for i in range(nsteps):
 
 problem = aligator.TrajOptProblem(x0, stages, term_cost=term_cost)
 
-# 末端位置不等式约束：|p_final - p_target| <= pos_tol
-pos_tol = 0.002  # 末端位置容差（米）：目标点 ±2 cm
-pos_lower = -pos_tol * np.ones(frame_pos_cstr_fn.nr)
-pos_upper = pos_tol * np.ones(frame_pos_cstr_fn.nr)
-problem.addTerminalConstraint(frame_pos_cstr_fn, constraints.BoxConstraint(pos_lower, pos_upper))
+# 末端位姿不等式约束：|log_SE3(target^{-1} * actual)| 分量均受限
+pos_tol = 0.002           # 位置容差（米），保留用户现有设置
+ori_tol = np.deg2rad(2.0) # 姿态容差（弧度）：约 ±5°
+pose_tol = np.concatenate([pos_tol * np.ones(3), ori_tol * np.ones(3)])
+problem.addTerminalConstraint(
+    frame_fn, constraints.BoxConstraint(-pose_tol, pose_tol)
+)
 tol = 1e-5            # 终止容差（原始/对偶残差）
 
-mu_init = 1e-4        # Prox DDP 罚因子初值
+mu_init = 1e-6      # Prox DDP 罚因子初值
 # verbose 选项：
 # - aligator.VerboseLevel.QUIET: 静默模式，不输出任何信息
 # - aligator.VerboseLevel.VERBOSE: 详细输出，显示每次迭代的信息
 # - aligator.VerboseLevel.VERYVERBOSE: 非常详细的输出，包含更多调试信息
 verbose = aligator.VerboseLevel.QUIET
-max_iters = 350       # 允许最大迭代次数
+max_iters = 800       # 允许最大迭代次数
 solver = aligator.SolverProxDDP(tol, mu_init, max_iters=max_iters, verbose=verbose)
 solver.rollout_type = aligator.ROLLOUT_NONLINEAR
 solver.sa_strategy = aligator.SA_LINESEARCH_NONMONOTONE
