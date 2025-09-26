@@ -206,8 +206,8 @@ _set_joint_positions(pin_model, initial_q, arm2_joint_names, desired_qpos_arm2)
 weld_constraint = create_weld_constraint(pin_model, pin_data, initial_q.copy())
 
 
-dt = 0.01      # 时间步长（秒）
-tf = 10.0
+dt = 0.005      # 时间步长（秒）
+tf = 20.0
 nsteps = int(tf / dt)  # 离散步数
 space = manifolds.MultibodyPhaseSpace(pin_model)
 ## 状态的维度
@@ -571,7 +571,7 @@ for i in range(nsteps):
 problem = aligator.TrajOptProblem(x0, stages, term_cost=term_cost)
 
 # 末端位姿不等式约束：|log_SE3(target^{-1} * actual)| 分量均受限
-pos_tol = 0.002           # 位置容差（米），保留用户现有设置
+pos_tol = 0.002           # “目标末端坐标系”里的平移残差
 ori_tol = np.deg2rad(2.0) # 姿态容差（弧度）：约 ±5°
 pose_tol = np.concatenate([pos_tol * np.ones(3), ori_tol * np.ones(3)])
 problem.addTerminalConstraint(
